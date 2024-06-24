@@ -30,7 +30,7 @@ export async function getServerSideProps(context: any) {
     }
 }
 
-export default function User({ table }: any) {
+export default function Disease({ table }: any) {
     const router = useRouter();
     const [filter, setFilter] = useState<any>(router.query)
     const [show, setShow] = useState<boolean>(false)
@@ -138,7 +138,7 @@ export default function User({ table }: any) {
     }
     return (
         <div>
-            <h2 className='text-2xl font-semibold'>Akses Admin</h2>
+            <h2 className='text-2xl font-semibold'>Data Penyakit</h2>
 
             <div className='mt-5'>
                 <div className='flex lg:flex-row flex-col justify-between items-center'>
@@ -152,7 +152,7 @@ export default function User({ table }: any) {
                             setModal({ ...modal, open: true, data: null, key: "create" })
                         }}>
                             <PlusIcon className='w-4' />
-                            Akses Admin
+                            Data Penyakit
                         </Button>
                     </div>
                 </div>
@@ -187,6 +187,7 @@ export default function User({ table }: any) {
                                 <input type="hidden" name="id" value={modal?.data?.id || null} />
                             }
                             <Input label='Nama' placeholder='Masukkan Nama' name='name' defaultValue={modal?.data?.name || ""} required />
+                            <Input label='No Telepon' placeholder='Masukkan No Telepon' name='phone' type='number' defaultValue={modal?.data?.phone || ""} required />
                             <Input label='Email' placeholder='Masukkan Email' name='email' type='email' defaultValue={modal?.data?.email || ""} />
                             <Input label='Password' placeholder='Masukkan Password' name='password' type='password' defaultValue={""} required={modal.key == 'create'} />
                             <div className='w-full my-2'>

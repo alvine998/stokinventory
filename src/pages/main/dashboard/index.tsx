@@ -10,45 +10,45 @@ export async function getServerSideProps(context: any) {
         // const { req, res } = context;
         // const session = getCookie("session", { req, res })
         // console.log(session);
-        const [brands, categories, reports, users, ads] = await Promise.all([
-            axios.get(CONFIG.base_url_api + `/brands?page=0&size=${size || 999999}`, {
-                headers: {
-                    "bearer-token": "tokotitohapi",
-                    "x-partner-code": "id.marketplace.tokotitoh"
-                }
-            }),
-            axios.get(CONFIG.base_url_api + `/categories?page=0&size=${size || 999999}`, {
-                headers: {
-                    "bearer-token": "tokotitohapi",
-                    "x-partner-code": "id.marketplace.tokotitoh"
-                }
-            }),
-            axios.get(CONFIG.base_url_api + `/reports?page=0&size=${size || 999999}`, {
-                headers: {
-                    "bearer-token": "tokotitohapi",
-                    "x-partner-code": "id.marketplace.tokotitoh"
-                }
-            }),
-            axios.get(CONFIG.base_url_api + `/users?role=customer&page=0&size=${size || 999999}`, {
-                headers: {
-                    "bearer-token": "tokotitohapi",
-                    "x-partner-code": "id.marketplace.tokotitoh"
-                }
-            }),
-            axios.get(CONFIG.base_url_api + `/ads?status=1&page=0&size=${size || 999999}`, {
-                headers: {
-                    "bearer-token": "tokotitohapi",
-                    "x-partner-code": "id.marketplace.tokotitoh"
-                }
-            }),
-        ])
+        // const [brands, categories, reports, users, ads] = await Promise.all([
+        //     axios.get(CONFIG.base_url_api + `/brands?page=0&size=${size || 999999}`, {
+        //         headers: {
+        //             "bearer-token": "tokotitohapi",
+        //             "x-partner-code": "id.marketplace.tokotitoh"
+        //         }
+        //     }),
+        //     axios.get(CONFIG.base_url_api + `/categories?page=0&size=${size || 999999}`, {
+        //         headers: {
+        //             "bearer-token": "tokotitohapi",
+        //             "x-partner-code": "id.marketplace.tokotitoh"
+        //         }
+        //     }),
+        //     axios.get(CONFIG.base_url_api + `/reports?page=0&size=${size || 999999}`, {
+        //         headers: {
+        //             "bearer-token": "tokotitohapi",
+        //             "x-partner-code": "id.marketplace.tokotitoh"
+        //         }
+        //     }),
+        //     axios.get(CONFIG.base_url_api + `/users?role=customer&page=0&size=${size || 999999}`, {
+        //         headers: {
+        //             "bearer-token": "tokotitohapi",
+        //             "x-partner-code": "id.marketplace.tokotitoh"
+        //         }
+        //     }),
+        //     axios.get(CONFIG.base_url_api + `/ads?status=1&page=0&size=${size || 999999}`, {
+        //         headers: {
+        //             "bearer-token": "tokotitohapi",
+        //             "x-partner-code": "id.marketplace.tokotitoh"
+        //         }
+        //     }),
+        // ])
         return {
             props: {
-                brands: brands?.data?.items?.count,
-                categories: categories?.data?.items?.count,
-                users: users?.data?.items?.count,
-                reports: reports?.data?.items?.count,
-                ads: ads?.data?.items?.count,
+                brands: 0,
+                categories: 0,
+                users: 0,
+                reports: 0,
+                ads: 0,
             }
         }
     } catch (error) {
@@ -76,33 +76,23 @@ export default function Dashboard({ brands, categories, users, reports, ads }: a
                 </div>
 
                 <div className='bg-orange-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Total Iklan Aktif :</h5>
+                    <h5 className='text-white font-semibold text-xl'>Total Data Penyakit :</h5>
                     <p className='text-white text-xl'>{ads || 0}</p>
                 </div>
 
                 <div className='bg-blue-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Total Laporan :</h5>
+                    <h5 className='text-white font-semibold text-xl'>Total Data Obat :</h5>
                     <p className='text-white text-xl'>{reports || 0}</p>
                 </div>
 
                 <div className='bg-gray-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Total Brand :</h5>
+                    <h5 className='text-white font-semibold text-xl'>Total Laporan :</h5>
                     <p className='text-white text-xl'>{brands || 0}</p>
                 </div>
-
-                <div className='bg-red-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Total Kategori :</h5>
-                    <p className='text-white text-xl'>{categories || 0}</p>
-                </div>
             </div>
 
             <div className='mt-5'>
-                <h2 className='text-xl'>Perkembangan Pengguna</h2>
-                <ApexChart />
-            </div>
-
-            <div className='mt-5'>
-                <h2 className='text-xl'>Perkembangan Iklan</h2>
+                <h2 className='text-xl'>Perkembangan</h2>
                 <ApexChart />
             </div>
         </div>

@@ -1,6 +1,6 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import { deleteCookie, getCookie } from 'cookies-next';
-import { BookIcon, Building2Icon, ChevronDownCircle, DoorOpenIcon, HomeIcon, NewspaperIcon, PencilIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
+import { BookIcon, Building2Icon, ChevronDownCircle, DoorOpenIcon, HomeIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
 import React, { ReactNode } from 'react'
@@ -15,19 +15,14 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
             icon: <HomeIcon />
         },
         {
-            name: "Pengguna",
-            href: `/main/customer`,
-            icon: <UserIcon />
+            name: "Data Penyakit",
+            href: `/main/disease`,
+            icon: <SquareActivityIcon />
         },
         {
-            name: "Iklan",
-            href: `/main/ads`,
-            icon: <Building2Icon />
-        },
-        {
-            name: "Kategori",
-            href: `/main/category`,
-            icon: <BookIcon />
+            name: "Data Obat",
+            href: `/main/medicine`,
+            icon: <PillIcon />
         },
         {
             name: "Laporan",
@@ -35,15 +30,10 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
             icon: <NewspaperIcon />
         },
         {
-            name: "Akses",
+            name: "Pengguna",
             href: `/main/user`,
             icon: <Users2Icon />
-        },
-        {
-            name: "Mitra",
-            href: `/main/partner`,
-            icon: <UserCircle2Icon />
-        },
+        }
     ]
     return (
         <div>
@@ -54,7 +44,7 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
                 </button> */}
                 <Menu>
                     <MenuButton className={'flex gap-2 items-center'}>
-                        <p className='text-white'>Halo, {session?.name?.toUpperCase()}</p>
+                        <p className='text-white'>Halo, {session?.name?.toUpperCase() || "Admin"}</p>
                         <ChevronDownCircle color='white' className='w-4' />
                     </MenuButton>
                     <Transition
@@ -90,8 +80,8 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
                 {/* Sidebar */}
                 <div className='bg-green-600 w-1/6 h-[100vh] absolute z-10 top-0 left-0 pt-2'>
                     <div className='flex justify-center items-center gap-5'>
-                        <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' />
-                        <h2 className='text-white text-2xl text-center'>TOKOTITOH</h2>
+                        {/* <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' /> */}
+                        <h2 className='text-white text-2xl text-center'>Aplikasi Sistem Pakar</h2>
                     </div>
                     <div className='flex flex-col mt-5'>
                         {

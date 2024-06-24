@@ -7,24 +7,24 @@ import { getCookie } from 'cookies-next'
 
 export default function LayoutDashboard({ children }: { children: ReactNode }) {
     const router = useRouter();
-    let sessions: any = getCookie('session') || null
-    useEffect(() => {
-        if (!sessions) {
-            router.push("/")
-        }
-    }, [])
+    // let sessions: any = "{name:'Admin'}"
+    // useEffect(() => {
+    //     if (!sessions) {
+    //         router.push("/")
+    //     }
+    // }, [])
     return (
         <section className='min-h-screen overflow-x-hidden relative'>
             <Head>
-                <title>Dashboard - Tokotitoh</title>
+                <title>Dashboard - Sistem Pakar Terintegrasi</title>
             </Head>
             <div className='lg:block hidden'>
-                <NavbarDesktop session={JSON?.parse(sessions)}>
+                <NavbarDesktop session={{name:"Admin"}}>
                     {children}
                 </NavbarDesktop>
             </div>
             <div className='lg:hidden block'>
-                <NavbarMobile session={JSON?.parse(sessions)}>
+                <NavbarMobile session={{name:"Admin"}}>
                     {children}
                 </NavbarMobile>
             </div>
