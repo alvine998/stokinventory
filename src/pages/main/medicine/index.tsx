@@ -13,8 +13,7 @@ import Swal from 'sweetalert2'
 export async function getServerSideProps(context: any) {
     try {
         const { page, limit, search } = context.query;
-        const result = await axios.get(CONFIG.base_url_api + `/users/list?page=${+page || 1}&limit=${+limit || 10}&search=${search || ""}`)
-        console.log(result?.data);
+        const result = await axios.get(CONFIG.base_url_api + `/medicines/list?page=${+page || 1}&limit=${+limit || 10}&search=${search || ""}`)
         return {
             props: {
                 table: result?.data || []
@@ -51,19 +50,9 @@ export default function Medicine({ table }: any) {
             selector: (row: any) => row?.name
         },
         {
-            name: "Email",
+            name: "Dosis",
             sortable: true,
-            selector: (row: any) => row?.email || "-"
-        },
-        {
-            name: "Peran",
-            sortable: true,
-            selector: (row: any) => row?.role == 'super_admin' ? "SUPER ADMIN" : "ADMIN"
-        },
-        {
-            name: "Status",
-            sortable: true,
-            selector: (row: any) => row?.status == '1' ? 'Aktif' : 'Non Aktif'
+            selector: (row: any) => row?.dose || "-"
         },
         {
             name: "Aksi",
@@ -91,19 +80,9 @@ export default function Medicine({ table }: any) {
                 ...formData
             }
             if (formData?.id) {
-                const result = await axios.patch(CONFIG.base_url_api + `/user`, payload, {
-                    headers: {
-                        "bearer-token": "tokotitohapi",
-                        "x-partner-code": "id.marketplace.tokotitoh"
-                    }
-                })
+                const result = await axios.patch(CONFIG.base_url_api + `/medicines/update/${formData?.id}`, payload)
             } else {
-                const result = await axios.post(CONFIG.base_url_api + `/user`, payload, {
-                    headers: {
-                        "bearer-token": "tokotitohapi",
-                        "x-partner-code": "id.marketplace.tokotitoh"
-                    }
-                })
+                const result = await axios.post(CONFIG.base_url_api + `/medicines/create`, payload)
             }
             Swal.fire({
                 icon: "success",
@@ -119,12 +98,7 @@ export default function Medicine({ table }: any) {
         try {
             e?.preventDefault();
             const formData = Object.fromEntries(new FormData(e.target))
-            const result = await axios.delete(CONFIG.base_url_api + `/user?id=${formData?.id}`, {
-                headers: {
-                    "bearer-token": "tokotitohapi",
-                    "x-partner-code": "id.marketplace.tokotitoh"
-                }
-            })
+            const result = await axios.delete(CONFIG.base_url_api + `/medicines/delete/${formData?.id}`)
             Swal.fire({
                 icon: "success",
                 text: "Data Berhasil Dihapus"
@@ -180,48 +154,14 @@ export default function Medicine({ table }: any) {
                 </div>
                 {
                     modal?.key == "create" || modal?.key == "update" ? <Modal open={modal.open} setOpen={() => setModal({ ...modal, open: false })}>
-                        <h2 className='text-xl font-semibold text-center'>{modal.key == 'create' ? "Tambah" : "Ubah"} Akses Admin</h2>
+                        <h2 className='text-xl font-semibold text-center'>{modal.key == 'create' ? "Tambah" : "Ubah"} Data Obat</h2>
                         <form onSubmit={onSubmit}>
                             {
                                 modal.key == "update" &&
                                 <input type="hidden" name="id" value={modal?.data?.id || null} />
                             }
                             <Input label='Nama' placeholder='Masukkan Nama' name='name' defaultValue={modal?.data?.name || ""} required />
-                            <Input label='No Telepon' placeholder='Masukkan No Telepon' name='phone' type='number' defaultValue={modal?.data?.phone || ""} required />
-                            <Input label='Email' placeholder='Masukkan Email' name='email' type='email' defaultValue={modal?.data?.email || ""} />
-                            <Input label='Password' placeholder='Masukkan Password' name='password' type='password' defaultValue={""} required={modal.key == 'create'} />
-                            <div className='w-full my-2'>
-                                <label className='text-gray-500' htmlFor="x">Peran</label>
-                                <div className='flex gap-5'>
-                                    <div className='flex gap-2'>
-                                        <input type='radio' name='role' value={'super_admin'} defaultChecked={modal?.data?.role == 'super_admin'} />
-                                        <span>Super Admin</span>
-                                    </div>
-                                    <div className='flex gap-2'>
-                                        <input type='radio' name='role' value={'admin'} defaultChecked={modal?.data?.role == 'admin'} />
-                                        <span>Admin</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {
-                                modal.key == 'update' ?
-                                    <div>
-                                        <div className='w-full my-2'>
-                                            <label className='text-gray-500' htmlFor="x">Status</label>
-                                            <div className='flex gap-5'>
-                                                <div className='flex gap-2'>
-                                                    <input type='radio' name='status' value={'1'} defaultChecked={modal?.data?.status == 1} />
-                                                    <span>Aktif</span>
-                                                </div>
-                                                <div className='flex gap-2'>
-                                                    <input type='radio' name='status' value={'0'} defaultChecked={modal?.data?.status == 0} />
-                                                    <span>Non Aktif</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    : ""
-                            }
+                            <Input label='Dosis' placeholder='Masukkan Dosis' name='dose' defaultValue={modal?.data?.dose || ""} required />
                             <div className='flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end'>
                                 <div>
                                     <Button color='white' type='button' onClick={() => {
@@ -245,7 +185,7 @@ export default function Medicine({ table }: any) {
                 }
                 {
                     modal?.key == "delete" ? <Modal open={modal.open} setOpen={() => setModal({ ...modal, open: false })}>
-                        <h2 className='text-xl font-semibold text-center'>Hapus Akses Admin</h2>
+                        <h2 className='text-xl font-semibold text-center'>Hapus Data Obat</h2>
                         <form onSubmit={onRemove}>
                             <input type="hidden" name="id" value={modal?.data?.id} />
                             <p className='text-center my-2'>Apakah anda yakin ingin menghapus data {modal?.data?.name}?</p>
