@@ -10,7 +10,7 @@ const nextConfig = {
     ],
   },
   env: {
-    BASE_URL_API_TOKOTITOH: 'http://127.0.0.1:5000'
+    BASE_URL_API_TOKOTITOH: 'http://103.245.39.242:5000'
   }
 }
 

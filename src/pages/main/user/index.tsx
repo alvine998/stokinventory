@@ -91,14 +91,14 @@ export default function User({ table }: any) {
                 ...formData
             }
             if (formData?.id) {
-                const result = await axios.patch(CONFIG.base_url_api + `/user`, payload, {
+                const result = await axios.patch(CONFIG.base_url_api + `/users/update/${payload?.id}`, payload, {
                     headers: {
                         "bearer-token": "tokotitohapi",
                         "x-partner-code": "id.marketplace.tokotitoh"
                     }
                 })
             } else {
-                const result = await axios.post(CONFIG.base_url_api + `/user`, payload, {
+                const result = await axios.post(CONFIG.base_url_api + `/users/register`, payload, {
                     headers: {
                         "bearer-token": "tokotitohapi",
                         "x-partner-code": "id.marketplace.tokotitoh"
@@ -119,7 +119,7 @@ export default function User({ table }: any) {
         try {
             e?.preventDefault();
             const formData = Object.fromEntries(new FormData(e.target))
-            const result = await axios.delete(CONFIG.base_url_api + `/user?id=${formData?.id}`, {
+            const result = await axios.delete(CONFIG.base_url_api + `/users/delete/${formData?.id}`, {
                 headers: {
                     "bearer-token": "tokotitohapi",
                     "x-partner-code": "id.marketplace.tokotitoh"
