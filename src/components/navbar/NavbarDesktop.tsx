@@ -103,7 +103,7 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
                             navs?.map((v: any) => (
                                 <button
                                     key={v?.name}
-                                    className={router.pathname.includes(v?.href) ? 'text-xl flex gap-2 bg-white p-2 text-blue-500 pl-10' : 'text-white text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-10'}
+                                    className={router.pathname == v?.href ? 'text-xl flex gap-2 bg-white p-2 text-blue-500 pl-10' : 'text-white text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-10'}
                                     type='button'
                                     onClick={() => {
                                         router.push(v?.href)
