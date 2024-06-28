@@ -4,19 +4,26 @@ import React, { useState } from 'react'
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
 export default function ApexChart() {
+    const startYear = 2020;
+    const currentYear = new Date().getFullYear();
+    const years = [];
+
+    for (let year = startYear; year <= currentYear; year++) {
+        years.push(year);
+    }
     const [chart, setChart] = useState<any>({
         options: {
             chart: {
                 id: "basic-bar"
             },
             xaxis: {
-                categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+                categories: years
             }
         },
         series: [
             {
                 name: "series-1",
-                data: [30, 40, 45, 50, 49, 60, 70, 91]
+                data: [30, 40, 45, 50, 49]
             }
         ]
     })

@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
-import { BookIcon, Building2Icon, ChevronDownCircle, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
+import { BookIcon, BoxIcon, Building2Icon, ChevronDownCircle, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
 import React, { ReactNode } from 'react'
@@ -14,40 +14,40 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
             icon: <HomeIcon />
         },
         {
-            name: "Pengguna",
-            href: `/main/customer`,
+            name: "Data Gejala",
+            href: `/main/symptom`,
+            icon: <StethoscopeIcon />
+        },
+        {
+            name: "Data Penyakit",
+            href: `/main/disease`,
+            icon: <SquareActivityIcon />
+        },
+        {
+            name: "Data Obat",
+            href: `/main/medicine`,
+            icon: <PillIcon />
+        },
+        {
+            name: "Dataset",
+            href: `/main/dataset`,
+            icon: <BoxIcon />
+        },
+        {
+            name: "Pengguna Aplikasi",
+            href: `/main/userapps`,
             icon: <UserIcon />
         },
-        {
-            name: "Iklan",
-            href: `/main/ads`,
-            icon: <Building2Icon />
-        },
-        {
-            name: "Kategori",
-            href: `/main/category`,
-            icon: <BookIcon />
-        },
-        // {
-        //     name: "Pembayaran",
-        //     href: `/main/payment`,
-        //     icon: <Wallet2Icon />
-        // },
         {
             name: "Laporan",
             href: `/main/report`,
             icon: <NewspaperIcon />
         },
         {
-            name: "Akses",
+            name: "Pengguna",
             href: `/main/user`,
             icon: <Users2Icon />
-        },
-        {
-            name: "Mitra",
-            href: `/main/partner`,
-            icon: <UserCircle2Icon />
-        },
+        }
     ]
     return (
         <div className='overflow-hidden'>
@@ -55,8 +55,8 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
             <div className='bg-green-600 w-full h-14 flex items-center px-2'>
                 <Menu>
                     <MenuButton className={'flex gap-2 items-center justify-between w-full'}>
-                        <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' />
-                        <p className='text-white text-xl'>TOKOTITOH</p>
+                        {/* <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' /> */}
+                        <p className='text-white text-xl'>Aplikasi Sistem Pakar</p>
                         <MenuIcon color='white' className='w-7' />
                     </MenuButton>
                     <Transition

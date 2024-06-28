@@ -1,6 +1,6 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import { deleteCookie, getCookie } from 'cookies-next';
-import { BookIcon, Building2Icon, ChevronDownCircle, DoorOpenIcon, HomeIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
+import { BookIcon, BoxIcon, Building2Icon, ChevronDownCircle, DoorOpenIcon, HomeIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
 import React, { ReactNode } from 'react'
@@ -28,6 +28,16 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
             name: "Data Obat",
             href: `/main/medicine`,
             icon: <PillIcon />
+        },
+        {
+            name: "Dataset",
+            href: `/main/dataset`,
+            icon: <BoxIcon />
+        },
+        {
+            name: "Pengguna Aplikasi",
+            href: `/main/userapps`,
+            icon: <UserIcon />
         },
         {
             name: "Laporan",
