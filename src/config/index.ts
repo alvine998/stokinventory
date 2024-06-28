@@ -1,3 +1,3 @@
 export const CONFIG = {
-    base_url_api: process.env.BASE_URL_API_TOKOTITOH || 'http://103.245.39.242:5000'
+    base_url_api: process.env.BASE_URL_API_TOKOTITOH || 'https://api-sistempakar.tokotitoh.co.id'
 }
