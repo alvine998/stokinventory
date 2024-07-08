@@ -16,12 +16,14 @@ export async function getServerSideProps(context: any) {
         const { page, limit, search } = context.query;
         const result = await axios.get(CONFIG.base_url_api + `/datasets/list?page=${+page || 1}&limit=${+limit || 10}&search=${search || ""}`)
         const diseases = await axios.get(CONFIG.base_url_api + `/diseases/list?limit=999999`)
+        const medicines = await axios.get(CONFIG.base_url_api + `/medicines/list?limit=999999`)
         const symptoms = await axios.get(CONFIG.base_url_api + `/symptoms/list?limit=999999`)
         return {
             props: {
                 table: result?.data || [],
                 diseases: diseases?.data?.items || [],
-                symptoms: symptoms?.data?.items || []
+                symptoms: symptoms?.data?.items || [],
+                medicines: medicines?.data?.items || []
             }
         }
     } catch (error: any) {
@@ -34,14 +36,15 @@ export async function getServerSideProps(context: any) {
     }
 }
 
-export default function Medicine({ table, diseases, symptoms }: any) {
+export default function Medicine({ table, diseases, symptoms, medicines }: any) {
     const router = useRouter();
     const [filter, setFilter] = useState<any>(router.query)
     const [show, setShow] = useState<boolean>(false)
     const [modal, setModal] = useState<useModal>()
     const [selected, setSelected] = useState<any>()
-    const SYMPTOMS: any[] = [...symptoms?.map((v: any) => ({ ...v, value: v?.id, label: v?.name }))]
+    const SYMPTOMS: any[] = [...symptoms?.map((v: any) => ({ ...v, value: v?.id, label: v?.name?.toUpperCase() }))]
     const DISEASES: any[] = [{ value: "", label: "Pilih Penyakit" }, ...diseases?.map((v: any) => ({ ...v, value: v?.id, label: v?.name }))]
+    const MEDICINES: any[] = [{ value: "", label: "Pilih Rekomendasi Obat" }, ...medicines?.map((v: any) => ({ ...v, value: v?.id, label: v?.name }))]
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setShow(true)
@@ -65,12 +68,17 @@ export default function Medicine({ table, diseases, symptoms }: any) {
         {
             name: "Tingkat Kesakitan",
             sortable: true,
-            selector: (row: any) => row?.level == 1 ? "Rendah" : row?.level == 2 ? "Sedang" : "Tinggi"
+            selector: (row: any) => levels?.find((v:any) => v?.value == row?.level)?.label
         },
         {
             name: "Diagnosa",
             sortable: true,
-            selector: (row: any) => row?.disease_name
+            selector: (row: any) => row?.diagnose
+        },
+        {
+            name: "Rekomendasi Obat",
+            sortable: true,
+            selector: (row: any) => row?.medicine
         },
         {
             name: "Aksi",
@@ -92,9 +100,9 @@ export default function Medicine({ table, diseases, symptoms }: any) {
 
     const levels = [
         { value: "", label: "Pilih Tingkat Kesakitan" },
-        { value: 1, label: "Rendah" },
-        { value: 2, label: "Sedang" },
-        { value: 3, label: "Tinggi" }
+        { value: 1, label: "Tidak Gawat Darurat" },
+        { value: 2, label: "Gawat Darurat" },
+        { value: 3, label: "Sangat Gawat Darurat" }
     ]
 
     const onSubmit = async (e: any) => {
@@ -105,9 +113,9 @@ export default function Medicine({ table, diseases, symptoms }: any) {
                 ...formData,
                 period: +formData?.period,
                 level: +formData?.level,
-                symptoms: selected?.symptoms?.map((v: any) => v?.name)?.join(","),
-                disease_id: +selected?.diagnose?.id,
-                disease_name: selected?.diagnose?.name,
+                symptoms: selected?.symptoms?.map((v: any) => v?.name?.toUpperCase())?.join(" | "),
+                diagnose: selected?.diagnose?.name,
+                medicine: selected?.medicine?.name,
             }
             if (formData?.id) {
                 const result = await axios.patch(CONFIG.base_url_api + `/datasets/update/${formData?.id}`, payload)
@@ -142,7 +150,7 @@ export default function Medicine({ table, diseases, symptoms }: any) {
     }
     return (
         <div>
-            <h2 className='text-2xl font-semibold'>Dataset Penyakit</h2>
+            <h2 className='text-2xl font-semibold'>Dataset</h2>
 
             <div className='mt-5'>
                 <div className='flex lg:flex-row flex-col justify-between items-center'>
@@ -156,7 +164,7 @@ export default function Medicine({ table, diseases, symptoms }: any) {
                             setModal({ ...modal, open: true, data: null, key: "create" })
                         }}>
                             <PlusIcon className='w-4' />
-                            Dataset Penyakit
+                            Dataset
                         </Button>
                     </div>
                 </div>
@@ -199,7 +207,7 @@ export default function Medicine({ table, diseases, symptoms }: any) {
                                     maxMenuHeight={150}
                                     defaultValue={
                                         modal?.data?.symptoms ?
-                                            SYMPTOMS?.filter((v: any) => modal?.data?.symptoms?.split(",")?.includes(v?.name))
+                                            SYMPTOMS?.filter((v: any) => modal?.data?.symptoms?.split(" | ")?.includes(v?.name?.toUpperCase()))
                                             : ""
                                     }
                                     placeholder="Pilih Gejala"
@@ -236,8 +244,28 @@ export default function Medicine({ table, diseases, symptoms }: any) {
                                     }}
                                     defaultValue={
                                         modal?.data?.disease_id ?
-                                            { value: modal?.data?.disease_id, label: modal?.data?.disease_name }
+                                            { value: modal?.data?.disease_id, label: modal?.data?.diagnose }
                                             : DISEASES?.[0]
+                                    }
+                                    required
+                                    menuPlacement='top'
+                                />
+                            </div>
+                            <div className='mt-2 relative'>
+                                <label htmlFor="medicine_id" className='text-gray-500'>Rekomendasi Obat</label>
+                                <ReactSelect
+                                    options={MEDICINES}
+                                    id='medicine_id'
+                                    name='medicine_id'
+                                    maxMenuHeight={150}
+                                    onChange={(e) => {
+                                        setSelected({ ...selected, medicine: e })
+                                    }}
+                                    required
+                                    defaultValue={
+                                        modal?.data?.medicine_id ?
+                                            { value: modal?.data?.medicine_id, label: modal?.data?.medicine }
+                                            : MEDICINES?.[0]
                                     }
                                     menuPlacement='top'
                                 />
