@@ -57,7 +57,7 @@ export default function User({ table }: any) {
         {
             name: "Peran",
             sortable: true,
-            selector: (row: any) => row?.role == 'super_admin' ? "SUPER ADMIN" : "ADMIN"
+            selector: (row: any) => row?.role == 'user' ? "USER" : "ADMIN"
         },
         {
             name: "Status",
@@ -177,8 +177,8 @@ export default function User({ table }: any) {
                                 <label className='text-gray-500' htmlFor="x">Peran</label>
                                 <div className='flex gap-5'>
                                     <div className='flex gap-2'>
-                                        <input type='radio' name='role' value={'super_admin'} defaultChecked={modal?.data?.role == 'super_admin'} />
-                                        <span>Super Admin</span>
+                                        <input type='radio' name='role' value={'user'} defaultChecked={modal?.data?.role == 'user'} />
+                                        <span>User</span>
                                     </div>
                                     <div className='flex gap-2'>
                                         <input type='radio' name='role' value={'admin'} defaultChecked={modal?.data?.role == 'admin'} />
