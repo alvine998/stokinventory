@@ -72,10 +72,10 @@ export default function Dashboard({ user_apps, diseases, medicines, symptoms, da
                 </div>
             </div>
 
-            <div className='mt-5'>
+            {/* <div className='mt-5'>
                 <h2 className='text-xl'>Perkembangan Pengguna Aplikasi</h2>
                 <ApexChart />
-            </div>
+            </div> */}
         </div>
     )
 }

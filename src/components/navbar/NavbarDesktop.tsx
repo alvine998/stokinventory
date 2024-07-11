@@ -39,11 +39,11 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
             href: `/main/userapps`,
             icon: <UserIcon />
         },
-        {
-            name: "Laporan",
-            href: `/main/report`,
-            icon: <NewspaperIcon />
-        },
+        // {
+        //     name: "Laporan",
+        //     href: `/main/report`,
+        //     icon: <NewspaperIcon />
+        // },
         {
             name: "Pengguna",
             href: `/main/user`,

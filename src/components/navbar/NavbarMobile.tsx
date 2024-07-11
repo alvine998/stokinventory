@@ -38,11 +38,11 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
             href: `/main/userapps`,
             icon: <UserIcon />
         },
-        {
-            name: "Laporan",
-            href: `/main/report`,
-            icon: <NewspaperIcon />
-        },
+        // {
+        //     name: "Laporan",
+        //     href: `/main/report`,
+        //     icon: <NewspaperIcon />
+        // },
         {
             name: "Pengguna",
             href: `/main/user`,
