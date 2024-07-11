@@ -54,11 +54,11 @@ export default function User({ table }: any) {
             sortable: true,
             selector: (row: any) => row?.email || "-"
         },
-        {
-            name: "Peran",
-            sortable: true,
-            selector: (row: any) => row?.role == 'user' ? "USER" : "ADMIN"
-        },
+        // {
+        //     name: "Peran",
+        //     sortable: true,
+        //     selector: (row: any) => row?.role == 'user' ? "USER" : "ADMIN"
+        // },
         {
             name: "Status",
             sortable: true,
@@ -173,7 +173,7 @@ export default function User({ table }: any) {
                             <Input label='Nama' placeholder='Masukkan Nama' name='name' defaultValue={modal?.data?.name || ""} required />
                             <Input label='Email' placeholder='Masukkan Email' name='email' type='email' defaultValue={modal?.data?.email || ""} />
                             <Input label='Password' placeholder='Masukkan Password' name='password' type='password' defaultValue={""} required={modal.key == 'create'} />
-                            <div className='w-full my-2'>
+                            {/* <div className='w-full my-2'>
                                 <label className='text-gray-500' htmlFor="x">Peran</label>
                                 <div className='flex gap-5'>
                                     <div className='flex gap-2'>
@@ -185,7 +185,7 @@ export default function User({ table }: any) {
                                         <span>Admin</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             {
                                 modal.key == 'update' ?
                                     <div>
