@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
-import { BookIcon, BoxIcon, Building2Icon, ChevronDownCircle, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
+import { BookIcon, BoxIcon, Building2Icon, ChevronDownCircle, ClipboardListIcon, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
 import React, { ReactNode } from 'react'
@@ -38,11 +38,11 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
             href: `/main/userapps`,
             icon: <UserIcon />
         },
-        // {
-        //     name: "Laporan",
-        //     href: `/main/report`,
-        //     icon: <NewspaperIcon />
-        // },
+        {
+            name: "Riwayat Diagnosa",
+            href: `/main/history`,
+            icon: <ClipboardListIcon />
+        },
         {
             name: "Pengguna",
             href: `/main/user`,
