@@ -45,7 +45,7 @@ export default function Medicine({ table }: any) {
     }, [filter])
     const CustomerColumn: any = [
         {
-            name: "Nama",
+            name: "Nama Penyakit",
             sortable: true,
             selector: (row: any) => row?.name
         },

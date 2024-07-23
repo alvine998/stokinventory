@@ -67,7 +67,7 @@ export default function Customer({ table }: any) {
     }, [filter])
     const CustomerColumn: any = [
         {
-            name: "Nama",
+            name: "Nama Pengguna",
             sortable: true,
             selector: (row: any) => row?.name
         },
