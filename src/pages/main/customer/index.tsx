@@ -160,7 +160,7 @@ export default function Customer({ table }: any) {
                                 setFilter({ ...filter, page: currentPage, size: currentRow })
                             }}
                             responsive={true}
-                            paginationTotalRows={table?.items?.count}
+                            paginationTotalRows={table?.total_items}
                             paginationDefaultPage={1}
                             paginationServer={true}
                             striped

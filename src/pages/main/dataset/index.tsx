@@ -18,6 +18,7 @@ export async function getServerSideProps(context: any) {
         const diseases = await axios.get(CONFIG.base_url_api + `/diseases/list?limit=999999`)
         const medicines = await axios.get(CONFIG.base_url_api + `/medicines/list?limit=999999`)
         const symptoms = await axios.get(CONFIG.base_url_api + `/symptoms/list?limit=999999`)
+        console.log(result.data);
         return {
             props: {
                 table: result?.data || [],
@@ -180,7 +181,7 @@ export default function Medicine({ table, diseases, symptoms, medicines }: any) 
                                 setFilter({ ...filter, page: currentPage, limit: currentRow })
                             }}
                             responsive={true}
-                            paginationTotalRows={table?.limit}
+                            paginationTotalRows={table?.total_items}
                             paginationDefaultPage={1}
                             paginationServer={true}
                             striped

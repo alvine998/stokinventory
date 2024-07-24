@@ -137,7 +137,7 @@ export default function Medicine({ table }: any) {
                                 setFilter({ ...filter, page: currentPage, limit: currentRow })
                             }}
                             responsive={true}
-                            paginationTotalRows={table?.limit}
+                            paginationTotalRows={table?.total_items}
                             paginationDefaultPage={1}
                             paginationServer={true}
                             striped

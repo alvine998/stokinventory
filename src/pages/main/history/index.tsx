@@ -80,7 +80,7 @@ export default function Medicine({ table }: any) {
         {
             name: "Skor Prediksi Penyakit",
             sortable: true,
-            selector: (row: any) => row?.disease_prediction_score
+            selector: (row: any) => row?.disease_precision_score
         },
         {
             name: "Skor Recall Penyakit",
@@ -159,7 +159,7 @@ export default function Medicine({ table }: any) {
                                 setFilter({ ...filter, page: currentPage, limit: currentRow })
                             }}
                             responsive={true}
-                            paginationTotalRows={table?.limit}
+                            paginationTotalRows={table?.total_items}
                             paginationDefaultPage={1}
                             paginationServer={true}
                             striped
