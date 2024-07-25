@@ -33,11 +33,11 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
             href: `/main/dataset`,
             icon: <BoxIcon />
         },
-        {
-            name: "Pengguna Aplikasi",
-            href: `/main/userapps`,
-            icon: <UserIcon />
-        },
+        // {
+        //     name: "Pengguna Aplikasi",
+        //     href: `/main/userapps`,
+        //     icon: <UserIcon />
+        // },
         {
             name: "Riwayat Diagnosa",
             href: `/main/history`,

@@ -48,6 +48,12 @@ export default function Medicine({ table }: any) {
     }, [filter])
     const CustomerColumn: any = [
         {
+            name: "Tanggal",
+            sortable: true,
+            width:"300px",
+            selector: (row: any) => row?.created_on
+        },
+        {
             name: "Nama Pengguna",
             sortable: true,
             selector: (row: any) => row?.user_app_name

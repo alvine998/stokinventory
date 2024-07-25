@@ -34,11 +34,11 @@ export default function NavbarDesktop({ children, session }: { children: ReactNo
             href: `/main/dataset`,
             icon: <BoxIcon />
         },
-        {
-            name: "Pengguna Aplikasi",
-            href: `/main/userapps`,
-            icon: <UserIcon />
-        },
+        // {
+        //     name: "Pengguna Aplikasi",
+        //     href: `/main/userapps`,
+        //     icon: <UserIcon />
+        // },
         {
             name: "Riwayat Diagnosa",
             href: `/main/history`,
