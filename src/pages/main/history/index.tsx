@@ -81,32 +81,32 @@ export default function Medicine({ table }: any) {
         {
             name: "Akurasi Penyakit",
             sortable: true,
-            selector: (row: any) => row?.disease_accuracy_score
+            selector: (row: any) => row?.disease_accuracy_score * 100 + " %"
         },
         {
             name: "Skor Prediksi Penyakit",
             sortable: true,
-            selector: (row: any) => row?.disease_precision_score
+            selector: (row: any) => row?.disease_precision_score * 100 + " %"
         },
         {
             name: "Skor Recall Penyakit",
             sortable: true,
-            selector: (row: any) => row?.disease_recall_score
+            selector: (row: any) => row?.disease_recall_score * 100 + " %"
         },
         {
             name: "Skor F1 Penyakit",
             sortable: true,
-            selector: (row: any) => row?.disease_f1_score
+            selector: (row: any) => row?.disease_f1_score * 100 + " %"
         },
         {
             name: "Akurasi Obat",
             sortable: true,
-            selector: (row: any) => row?.medicine_accuracy_score
+            selector: (row: any) => row?.medicine_accuracy_score * 100 + " %"
         },
         {
             name: "Rekomendasi Obat",
             sortable: true,
-            selector: (row: any) => row?.medicine_recommendation
+            selector: (row: any) => row?.medicine_recommendation || "-"
         },
         {
             name: "Aksi",
