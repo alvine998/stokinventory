@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
-import { ArchiveRestoreIcon, ArrowLeftRightIcon, BookIcon, BoxesIcon, BoxIcon, Building2Icon, ChevronDownCircle, ClipboardListIcon, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, StoreIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
+import { ArchiveRestoreIcon, ArrowLeftRightIcon, BookIcon, BoxesIcon, BoxIcon, Building2Icon, ChevronDownCircle, ClipboardListIcon, CogIcon, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, StoreIcon, TriangleAlertIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
 import React, { ReactNode } from 'react'
@@ -24,6 +24,11 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
             icon: <StoreIcon />,
           },
           {
+            name: "Produk Kadaluwarsa",
+            href: `/main/expired`,
+            icon: <TriangleAlertIcon />,
+          },
+          {
             name: "Stock Opname (SO)",
             href: `/main/so`,
             icon: <ArrowLeftRightIcon />,
@@ -38,6 +43,11 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
             href: `/main/do`,
             icon: <ArchiveRestoreIcon />,
           },
+        //   {
+        //     name: "Pengaturan",
+        //     href: `/main/setting`,
+        //     icon: <CogIcon />,
+        //   },
           {
             name: "Akses Admin",
             href: `/main/user`,

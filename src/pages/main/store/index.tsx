@@ -37,7 +37,7 @@ export async function getServerSideProps(context: any) {
     }
 }
 
-export default function Medicine({ table, diseases, symptoms, medicines }: any) {
+export default function Store({ table, diseases, symptoms, medicines }: any) {
     const router = useRouter();
     const [filter, setFilter] = useState<any>(router.query)
     const [show, setShow] = useState<boolean>(false)
@@ -57,29 +57,29 @@ export default function Medicine({ table, diseases, symptoms, medicines }: any) 
     }, [filter])
     const CustomerColumn: any = [
         {
-            name: "Gejala",
+            name: "Nama Toko",
             sortable: true,
             selector: (row: any) => row?.symptoms
         },
         {
-            name: "Lama Sakit",
+            name: "Kode",
             sortable: true,
-            selector: (row: any) => row?.period + " Hari"
+            selector: (row: any) => row?.period || "-"
         },
         {
-            name: "Tingkat Kesakitan",
+            name: "Alamat",
             sortable: true,
-            selector: (row: any) => levels?.find((v:any) => v?.value == row?.level)?.label
+            selector: (row: any) => row?.address || "-"
         },
         {
-            name: "Diagnosa",
+            name: "Latitude",
             sortable: true,
-            selector: (row: any) => row?.diagnose
+            selector: (row: any) => row?.lat || "-"
         },
         {
-            name: "Rekomendasi Obat",
+            name: "Longitude",
             sortable: true,
-            selector: (row: any) => row?.medicine
+            selector: (row: any) => row?.long || "-"
         },
         {
             name: "Aksi",
@@ -151,7 +151,7 @@ export default function Medicine({ table, diseases, symptoms, medicines }: any) 
     }
     return (
         <div>
-            <h2 className='text-2xl font-semibold'>Dataset</h2>
+            <h2 className='text-2xl font-semibold'>Data Toko</h2>
 
             <div className='mt-5'>
                 <div className='flex lg:flex-row flex-col justify-between items-center'>
@@ -165,7 +165,7 @@ export default function Medicine({ table, diseases, symptoms, medicines }: any) 
                             setModal({ ...modal, open: true, data: null, key: "create" })
                         }}>
                             <PlusIcon className='w-4' />
-                            Dataset
+                            Toko
                         </Button>
                     </div>
                 </div>
@@ -193,7 +193,7 @@ export default function Medicine({ table, diseases, symptoms, medicines }: any) 
                 </div>
                 {
                     modal?.key == "create" || modal?.key == "update" ? <Modal open={modal.open} setOpen={() => setModal({ ...modal, open: false })}>
-                        <h2 className='text-xl font-semibold text-center'>{modal.key == 'create' ? "Tambah" : "Ubah"} Dataset Penyakit</h2>
+                        <h2 className='text-xl font-semibold text-center'>{modal.key == 'create' ? "Tambah" : "Ubah"} Data Toko</h2>
                         <form onSubmit={onSubmit}>
                             {
                                 modal.key == "update" &&
@@ -294,10 +294,10 @@ export default function Medicine({ table, diseases, symptoms, medicines }: any) 
                 }
                 {
                     modal?.key == "delete" ? <Modal open={modal.open} setOpen={() => setModal({ ...modal, open: false })}>
-                        <h2 className='text-xl font-semibold text-center'>Hapus Dataset Penyakit</h2>
+                        <h2 className='text-xl font-semibold text-center'>Hapus Data Toko</h2>
                         <form onSubmit={onRemove}>
                             <input type="hidden" name="id" value={modal?.data?.id} />
-                            <p className='text-center my-2'>Apakah anda yakin ingin menghapus data {modal?.data?.name}?</p>
+                            <p className='text-center my-2'>Apakah anda yakin ingin menghapus toko {modal?.data?.name}?</p>
                             <div className='flex gap-2 lg:flex-row flex-col-reverse justify-end'>
                                 <div>
                                     <Button color='white' type='button' onClick={() => {

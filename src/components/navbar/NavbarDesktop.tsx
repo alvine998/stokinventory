@@ -15,6 +15,7 @@ import {
   Building2Icon,
   ChevronDownCircle,
   ClipboardListIcon,
+  CogIcon,
   DoorOpenIcon,
   HandshakeIcon,
   HomeIcon,
@@ -24,6 +25,7 @@ import {
   SquareActivityIcon,
   StethoscopeIcon,
   StoreIcon,
+  TriangleAlertIcon,
   UserCircle,
   UserCircle2Icon,
   UserIcon,
@@ -61,6 +63,11 @@ export default function NavbarDesktop({
       icon: <StoreIcon />,
     },
     {
+      name: "Produk Kadaluwarsa",
+      href: `/main/expired`,
+      icon: <TriangleAlertIcon />,
+    },
+    {
       name: "Stock Opname (SO)",
       href: `/main/so`,
       icon: <ArrowLeftRightIcon />,
@@ -80,6 +87,11 @@ export default function NavbarDesktop({
       href: `/main/user`,
       icon: <Users2Icon />,
     },
+    // {
+    //   name: "Pengaturan",
+    //   href: `/main/setting`,
+    //   icon: <CogIcon />,
+    // },
     {
       name: "Partner",
       href: `/main/partner`,

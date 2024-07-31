@@ -5,6 +5,7 @@ import { CustomTableStyle } from "@/components/table/CustomTableStyle";
 import { CONFIG } from "@/config";
 import axios from "axios";
 import {
+  ClipboardList,
   PencilIcon,
   PlusIcon,
   SaveAllIcon,
@@ -21,7 +22,7 @@ export async function getServerSideProps(context: any) {
     const { page, limit, search } = context.query;
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/diseases/list?page=${+page || 1}&limit=${+limit || 10}&search=${
+        `/medicines/list?page=${+page || 1}&limit=${+limit || 10}&search=${
           search || ""
         }`
     );
@@ -56,9 +57,29 @@ export default function Medicine({ table }: any) {
   }, [filter]);
   const CustomerColumn: any = [
     {
-      name: "Nama Penyakit",
+      name: "Nama Produk",
       sortable: true,
       selector: (row: any) => row?.name,
+    },
+    {
+      name: "Kode",
+      sortable: true,
+      selector: (row: any) => row?.dose || "-",
+    },
+    {
+      name: "Stok",
+      sortable: true,
+      selector: (row: any) => row?.stock || "0",
+    },
+    {
+      name: "Harga Modal",
+      sortable: true,
+      selector: (row: any) => row?.capital_price || "0",
+    },
+    {
+      name: "Min Order",
+      sortable: true,
+      selector: (row: any) => row?.moq || "0",
     },
     {
       name: "Aksi",
@@ -95,37 +116,25 @@ export default function Medicine({ table }: any) {
       const payload = {
         ...formData,
       };
-      let result: any = null;
       if (formData?.id) {
-        result = await axios.patch(
-          CONFIG.base_url_api + `/diseases/update/${formData?.id}`,
+        const result = await axios.patch(
+          CONFIG.base_url_api + `/medicines/update/${formData?.id}`,
           payload
         );
       } else {
-        result = await axios.post(
-          CONFIG.base_url_api + `/diseases/create`,
+        const result = await axios.post(
+          CONFIG.base_url_api + `/medicines/create`,
           payload
         );
       }
-      if (result.data[1] == 400) {
-        Swal.fire({
-          icon: "warning",
-          text: "Data Sudah Tersedia",
-        });
-      } else {
-        Swal.fire({
-            icon: "success",
-            text: "Data Berhasil Disimpan",
-          });
-      }
+      Swal.fire({
+        icon: "success",
+        text: "Data Berhasil Disimpan",
+      });
       setModal({ ...modal, open: false });
       router.push("");
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      Swal.fire({
-        icon: "error",
-        text: error?.message || "Error",
-      });
     }
   };
   const onRemove = async (e: any) => {
@@ -133,7 +142,7 @@ export default function Medicine({ table }: any) {
       e?.preventDefault();
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
-        CONFIG.base_url_api + `/diseases/delete/${formData?.id}`
+        CONFIG.base_url_api + `/medicines/delete/${formData?.id}`
       );
       Swal.fire({
         icon: "success",
@@ -147,7 +156,7 @@ export default function Medicine({ table }: any) {
   };
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Data Tesskill</h2>
+      <h2 className="text-2xl font-semibold">Data Produk</h2>
 
       <div className="mt-5">
         <div className="flex lg:flex-row flex-col justify-between items-center">
@@ -162,20 +171,37 @@ export default function Medicine({ table }: any) {
               }}
             />
           </div>
-          <div className="lg:w-auto w-full">
-            <Button
-              type="button"
-              color="info"
-              className={
-                "flex gap-2 px-2 items-center lg:justify-start justify-center"
-              }
-              onClick={() => {
-                setModal({ ...modal, open: true, data: null, key: "create" });
-              }}
-            >
-              <PlusIcon className="w-4" />
-              Data Tesskill
-            </Button>
+          <div className="lg:w-auto w-full flex gap-2">
+            <div className="w-auto">
+              <Button
+                type="button"
+                color="primary"
+                className={
+                  "flex gap-2 px-2 items-center lg:justify-start justify-center"
+                }
+                onClick={() => {
+                  router.push(`/main/product/selling-price`)
+                }}
+              >
+                <ClipboardList className="w-4" />
+                Perkiraan Harga Jual
+              </Button>
+            </div>
+            <div className="w-auto">
+              <Button
+                type="button"
+                color="info"
+                className={
+                  "flex gap-2 px-2 items-center lg:justify-start justify-center"
+                }
+                onClick={() => {
+                  setModal({ ...modal, open: true, data: null, key: "create" });
+                }}
+              >
+                <PlusIcon className="w-4" />
+                Data Produk
+              </Button>
+            </div>
           </div>
         </div>
         <div className="mt-5">
@@ -205,7 +231,7 @@ export default function Medicine({ table }: any) {
             setOpen={() => setModal({ ...modal, open: false })}
           >
             <h2 className="text-xl font-semibold text-center">
-              {modal.key == "create" ? "Tambah" : "Ubah"} Data Tesskill
+              {modal.key == "create" ? "Tambah" : "Ubah"} Data Produk
             </h2>
             <form onSubmit={onSubmit}>
               {modal.key == "update" && (
@@ -216,10 +242,41 @@ export default function Medicine({ table }: any) {
                 />
               )}
               <Input
-                label="Nama Penyakit"
-                placeholder="Masukkan Nama Tesskill"
+                label="Nama"
+                placeholder="Masukkan Nama"
                 name="name"
                 defaultValue={modal?.data?.name || ""}
+                required
+              />
+              <Input
+                label="Kode"
+                placeholder="Masukkan Kode"
+                name="code"
+                defaultValue={modal?.data?.code || ""}
+                required
+              />
+              <Input
+                label="Stok"
+                placeholder="Masukkan Stok"
+                name="stock"
+                defaultValue={modal?.data?.stock || ""}
+                type="number"
+                required
+              />
+              <Input
+                isCurrency
+                label="Harga Modal"
+                placeholder="Masukkan Harga Modal"
+                name="capital_price"
+                defaultValue={modal?.data?.capital_price || ""}
+                required
+              />
+              <Input
+                label="Min Order"
+                placeholder="Masukkan Min Order"
+                name="moq"
+                defaultValue={modal?.data?.moq || ""}
+                type="number"
                 required
               />
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
@@ -256,7 +313,7 @@ export default function Medicine({ table }: any) {
             setOpen={() => setModal({ ...modal, open: false })}
           >
             <h2 className="text-xl font-semibold text-center">
-              Hapus Data Tesskill
+              Hapus Data Obat
             </h2>
             <form onSubmit={onRemove}>
               <input type="hidden" name="id" value={modal?.data?.id} />
