@@ -1,6 +1,8 @@
 import Button from "@/components/Button";
+import FileUpload from "@/components/FileUpload";
 import Input from "@/components/Input";
 import Modal, { useModal } from "@/components/Modal";
+import Radio from "@/components/Radio";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
 import { CONFIG } from "@/config";
 import axios from "axios";
@@ -10,7 +12,9 @@ import {
   SaveAllIcon,
   Trash2Icon,
   TrashIcon,
+  UploadCloudIcon,
 } from "lucide-react";
+import moment from "moment";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
@@ -45,6 +49,10 @@ export default function Medicine({ table }: any) {
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [image, setImage] = useState<any>({
+    data:"",
+    preview: ""
+  })
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -54,11 +62,21 @@ export default function Medicine({ table }: any) {
     const queryFilter = new URLSearchParams(filter).toString();
     router.push(`?${queryFilter}`);
   }, [filter]);
-  const CustomerColumn: any = [
+  const Column: any = [
     {
-      name: "Nama Penyakit",
+      name: "Waktu",
       sortable: true,
-      selector: (row: any) => row?.name,
+      selector: (row: any) => row?.date,
+    },
+    {
+      name: "Jenis Stok",
+      sortable: true,
+      selector: (row: any) => row?.type == "in" ? "Barang Masuk" : "Barang Keluar",
+    },
+    {
+      name: "Bukti",
+      sortable: true,
+      selector: (row: any) => <a href={row?.image} className="text-blue-500" >Lihat</a>,
     },
     {
       name: "Aksi",
@@ -114,9 +132,9 @@ export default function Medicine({ table }: any) {
         });
       } else {
         Swal.fire({
-            icon: "success",
-            text: "Data Berhasil Disimpan",
-          });
+          icon: "success",
+          text: "Data Berhasil Disimpan",
+        });
       }
       setModal({ ...modal, open: false });
       router.push("");
@@ -147,7 +165,7 @@ export default function Medicine({ table }: any) {
   };
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Data Penyakit</h2>
+      <h2 className="text-2xl font-semibold">Stock Opname (SO)</h2>
 
       <div className="mt-5">
         <div className="flex lg:flex-row flex-col justify-between items-center">
@@ -174,7 +192,7 @@ export default function Medicine({ table }: any) {
               }}
             >
               <PlusIcon className="w-4" />
-              Data Penyakit
+              Input Stok
             </Button>
           </div>
         </div>
@@ -193,7 +211,7 @@ export default function Medicine({ table }: any) {
               paginationDefaultPage={1}
               paginationServer={true}
               striped
-              columns={CustomerColumn}
+              columns={Column}
               data={table?.items}
               customStyles={CustomTableStyle}
             />
@@ -205,7 +223,7 @@ export default function Medicine({ table }: any) {
             setOpen={() => setModal({ ...modal, open: false })}
           >
             <h2 className="text-xl font-semibold text-center">
-              {modal.key == "create" ? "Tambah" : "Ubah"} Data Penyakit
+              {modal.key == "create" ? "Tambah" : "Ubah"} Input Stok
             </h2>
             <form onSubmit={onSubmit}>
               {modal.key == "update" && (
@@ -215,13 +233,39 @@ export default function Medicine({ table }: any) {
                   value={modal?.data?.id || null}
                 />
               )}
+              <Radio
+                id="radio1"
+                name="type"
+                options={[
+                  {
+                    name: "Barang Masuk",
+                    value: "in",
+                    checked: modal?.data?.type == "in" || true
+                  },
+                  {
+                    name: "Barang Keluar",
+                    value: "out",
+                    checked: modal?.data?.type == "out"
+                  },
+                ]}
+                label="Jenis Stok"
+              />
               <Input
-                label="Nama Penyakit"
-                placeholder="Masukkan Nama Penyakit"
-                name="name"
-                defaultValue={modal?.data?.name || ""}
+                label="Waktu"
+                name="date"
+                defaultValue={
+                  modal?.data?.date || moment().format("YYYY-MM-DD HH:mm")
+                }
+                type="datetime-local"
                 required
               />
+              <FileUpload image={image} label="Bukti" onChange={(e: any)=>{
+                const file = e.target.files
+                if(file){
+                  console.log(file);
+                  setImage({data: file[0], preview: URL.createObjectURL(file[0])})
+                }
+              }} name="image" defaultValue={image?.data || ""} />
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
                 <div>
                   <Button

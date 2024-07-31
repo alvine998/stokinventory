@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
-import { BookIcon, BoxesIcon, BoxIcon, Building2Icon, ChevronDownCircle, ClipboardListIcon, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
+import { ArchiveRestoreIcon, ArrowLeftRightIcon, BookIcon, BoxesIcon, BoxIcon, Building2Icon, ChevronDownCircle, ClipboardListIcon, DoorOpenIcon, HomeIcon, MenuIcon, NewspaperIcon, PencilIcon, PillIcon, SquareActivityIcon, StethoscopeIcon, StoreIcon, UserCircle, UserCircle2Icon, UserIcon, Users2Icon, Wallet2Icon } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
 import React, { ReactNode } from 'react'
@@ -11,57 +11,47 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
         {
             name: "Dashboard",
             href: `/main/dashboard`,
-            icon: <HomeIcon />
-        },
-        {
-            name: "Data Gejala",
-            href: `/main/symptom`,
-            icon: <StethoscopeIcon />
-        },
-        {
-            name: "Data Penyakit",
-            href: `/main/disease`,
-            icon: <SquareActivityIcon />
-        },
-        {
-            name: "Data Obat",
-            href: `/main/medicine`,
-            icon: <PillIcon />
-        },
-        {
-            name: "Dataset",
-            href: `/main/dataset`,
-            icon: <BoxIcon />
-        },
-        // {
-        //     name: "Pengguna Aplikasi",
-        //     href: `/main/userapps`,
-        //     icon: <UserIcon />
-        // },
-        {
-            name: "Riwayat Diagnosa",
-            href: `/main/history`,
-            icon: <ClipboardListIcon />
-        },
-        {
-            name: "Tesskill",
-            href: `/main/tesskill`,
-            icon: <BoxesIcon />,
+            icon: <HomeIcon />,
           },
-        {
-            name: "Pengguna",
+          {
+            name: "Data Produk",
+            href: `/main/product`,
+            icon: <BoxIcon />,
+          },
+          {
+            name: "Data Toko",
+            href: `/main/store`,
+            icon: <StoreIcon />,
+          },
+          {
+            name: "Stock Opname (SO)",
+            href: `/main/so`,
+            icon: <ArrowLeftRightIcon />,
+          },
+          {
+            name: "Purchase Order (PO)",
+            href: `/main/po`,
+            icon: <ClipboardListIcon />,
+          },
+          {
+            name: "Delivery Order (DO)",
+            href: `/main/do`,
+            icon: <ArchiveRestoreIcon />,
+          },
+          {
+            name: "Akses Admin",
             href: `/main/user`,
-            icon: <Users2Icon />
-        }
+            icon: <Users2Icon />,
+          },
     ]
     return (
         <div className='overflow-hidden'>
             {/* Topbar */}
-            <div className='bg-green-600 w-full h-14 flex items-center px-2'>
+            <div className='bg-blue-600 w-full h-14 flex items-center px-2'>
                 <Menu>
                     <MenuButton className={'flex gap-2 items-center justify-between w-full'}>
                         {/* <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' /> */}
-                        <p className='text-white text-xl'>Aplikasi Sistem Pakar</p>
+                        <p className='text-white text-xl'>StokInventory</p>
                         <MenuIcon color='white' className='w-7' />
                     </MenuButton>
                     <Transition
@@ -82,7 +72,7 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
                                         <button
                                             type='button'
                                             className={router?.pathname?.includes(v?.href) ?
-                                                "group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 bg-green-600 text-white" :
+                                                "group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 bg-blue-600 text-white" :
                                                 `group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 bg-white ${v?.name == 'Logout' ? "text-red-500" : "text-black"}`
                                             }
                                             onClick={() => {

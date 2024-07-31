@@ -7,6 +7,8 @@ import {
 } from "@headlessui/react";
 import { deleteCookie, getCookie } from "cookies-next";
 import {
+  ArchiveRestoreIcon,
+  ArrowLeftRightIcon,
   BookIcon,
   BoxesIcon,
   BoxIcon,
@@ -14,16 +16,19 @@ import {
   ChevronDownCircle,
   ClipboardListIcon,
   DoorOpenIcon,
+  HandshakeIcon,
   HomeIcon,
   NewspaperIcon,
   PencilIcon,
   PillIcon,
   SquareActivityIcon,
   StethoscopeIcon,
+  StoreIcon,
   UserCircle,
   UserCircle2Icon,
   UserIcon,
   Users2Icon,
+  UserSquareIcon,
   Wallet2Icon,
 } from "lucide-react";
 import Image from "next/image";
@@ -46,57 +51,52 @@ export default function NavbarDesktop({
       icon: <HomeIcon />,
     },
     {
-      name: "Data Gejala",
-      href: `/main/symptom`,
-      icon: <StethoscopeIcon />,
-    },
-    {
-      name: "Data Penyakit",
-      href: `/main/disease`,
-      icon: <SquareActivityIcon />,
-    },
-    {
-      name: "Data Obat",
-      href: `/main/medicine`,
-      icon: <PillIcon />,
-    },
-    {
-      name: "Dataset",
-      href: `/main/dataset`,
+      name: "Data Produk",
+      href: `/main/product`,
       icon: <BoxIcon />,
     },
-    // {
-    //     name: "Pengguna Aplikasi",
-    //     href: `/main/userapps`,
-    //     icon: <UserIcon />
-    // },
     {
-      name: "Riwayat Diagnosa",
-      href: `/main/history`,
+      name: "Data Toko",
+      href: `/main/store`,
+      icon: <StoreIcon />,
+    },
+    {
+      name: "Stock Opname (SO)",
+      href: `/main/so`,
+      icon: <ArrowLeftRightIcon />,
+    },
+    {
+      name: "Purchase Order (PO)",
+      href: `/main/po`,
       icon: <ClipboardListIcon />,
     },
     {
-      name: "Tesskill",
-      href: `/main/tesskill`,
-      icon: <BoxesIcon />,
+      name: "Delivery Order (DO)",
+      href: `/main/do`,
+      icon: <ArchiveRestoreIcon />,
     },
     {
-      name: "Pengguna",
+      name: "Akses Admin",
       href: `/main/user`,
       icon: <Users2Icon />,
+    },
+    {
+      name: "Partner",
+      href: `/main/partner`,
+      icon: <HandshakeIcon />,
     },
   ];
   return (
     <div>
       {/* Topbar */}
-      <div className="bg-green-600 w-full h-10 flex justify-end items-center px-10">
+      <div className="bg-blue-600 w-full h-10 flex justify-end items-center px-10">
         {/* <button className='flex items-center gap-2'>
                    
                 </button> */}
         <Menu>
           <MenuButton className={"flex gap-2 items-center"}>
             <p className="text-white">
-              Halo, {session?.name?.toUpperCase() || "Admin"}
+              Hello, {session?.name?.toUpperCase() || "Admin"}
             </p>
             <ChevronDownCircle color="white" className="w-4" />
           </MenuButton>
@@ -112,12 +112,6 @@ export default function NavbarDesktop({
               anchor="bottom end"
               className="w-40 origin-top-right rounded-xl border border-white/5 bg-white p-1 text-sm/6 text-white [--anchor-gap:var(--spacing-1)] focus:outline-none"
             >
-              {/* <MenuItem>
-                                <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white text-black">
-                                    <UserCircle className="size-4 text-black" />
-                                    Ubah Profil
-                                </button>
-                            </MenuItem> */}
               <MenuItem>
                 <button
                   type="button"
@@ -138,11 +132,11 @@ export default function NavbarDesktop({
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="bg-green-600 w-1/6 h-[100vh] absolute z-10 top-0 left-0 pt-2">
+        <div className="bg-blue-600 w-1/5 h-[100vh] absolute z-10 top-0 left-0 pt-2">
           <div className="flex justify-center items-center gap-5">
             {/* <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' /> */}
             <h2 className="text-white text-2xl text-center">
-              Aplikasi Sistem Pakar
+              StokInventory
             </h2>
           </div>
           <div className="flex flex-col mt-5">
@@ -151,8 +145,8 @@ export default function NavbarDesktop({
                 key={v?.name}
                 className={
                   router.pathname == v?.href
-                    ? "text-xl flex gap-2 bg-white p-2 text-blue-500 pl-10"
-                    : "text-white text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-10"
+                    ? "text-xl flex gap-2 bg-white p-2 text-blue-500 pl-2"
+                    : "text-white text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-2"
                 }
                 type="button"
                 onClick={() => {

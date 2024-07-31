@@ -42,40 +42,30 @@ export default function Dashboard({ user_apps, diseases, medicines, symptoms, da
         <div>
 
             <div className='bg-blue-500 w-full h-auto p-2 rounded'>
-                <p className='text-white text-xl lg:text-left text-center'>Selamat Datang Admin</p>
+                <p className='text-white text-xl lg:text-left text-center'>Welcome Home Admin</p>
             </div>
 
             <div className='flex lg:flex-row flex-col gap-2 justify-between items-center mt-5'>
                 <div className='bg-green-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Pengguna Aplikasi :</h5>
+                    <h5 className='text-white font-semibold text-xl'>Produk :</h5>
                     <p className='text-white text-xl'>{user_apps || 0}</p>
                 </div>
 
                 <div className='bg-orange-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Data Penyakit :</h5>
+                    <h5 className='text-white font-semibold text-xl'>Toko :</h5>
                     <p className='text-white text-xl'>{diseases || 0}</p>
                 </div>
 
                 <div className='bg-blue-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Data Obat :</h5>
+                    <h5 className='text-white font-semibold text-xl'>Admin :</h5>
                     <p className='text-white text-xl'>{medicines || 0}</p>
-                </div>
-
-                <div className='bg-gray-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Data Gejala :</h5>
-                    <p className='text-white text-xl'>{symptoms || 0}</p>
-                </div>
-
-                <div className='bg-red-500 w-full h-auto p-2 rounded'>
-                    <h5 className='text-white font-semibold text-xl'>Dataset Penyakit :</h5>
-                    <p className='text-white text-xl'>{dataset_diseases || 0}</p>
                 </div>
             </div>
 
-            {/* <div className='mt-5'>
-                <h2 className='text-xl'>Perkembangan Pengguna Aplikasi</h2>
+            <div className='mt-5'>
+                <h2 className='text-xl'>Grafik Pertumbuhan Stock Opname</h2>
                 <ApexChart />
-            </div> */}
+            </div>
         </div>
     )
 }

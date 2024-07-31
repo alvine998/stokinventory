@@ -39,20 +39,20 @@ export default function Login() {
       <Head>
         <title>LOGIN</title>
       </Head>
-      <div className='w-full bg-green-500 h-[100vh] lg:flex flex-col gap-2 justify-center items-center hidden'>
+      <div className='w-full bg-blue-500 h-[100vh] lg:flex flex-col gap-2 justify-center items-center hidden'>
         {/* <Image alt='icon-logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-[300px] h-[300px]' /> */}
-        <h2 className='text-white font-bold text-3xl'>Aplikasi Sistem Pakar Puskesmas Sriamur</h2>
-        <p className='text-white'>Dashboard Aplikasi Sistem Pakar Puskesmas Sriamur</p>
+        <h2 className='text-white font-bold text-3xl'>StokInventory</h2>
+        <p className='text-white'>Manage Your Data Stocks From Here</p>
       </div>
       <div className='w-full bg-slate-50 h-[100vh] flex flex-col gap-2 justify-center items-center'>
         <div className='border border-gray-200 shadow rounded lg:w-1/2 w-full px-10 h-auto p-4'>
-          <h2 className='text-center text-2xl font-semibold'>LOGIN</h2>
+          <h2 className='text-center text-2xl font-semibold'>StokInventory</h2>
           <form className='mt-4' onSubmit={login}>
-            <Input label='Email' placeholder='Masukkan Email' type='text' name='email' required />
+            <Input label='Email' placeholder='Enter Email' type='text' name='email' required />
             <Input label='Password' placeholder='********' type='password' name='password' required />
             {/* <a href="#" className='flex justify-end text-blue-500 hover:text-blue-700 duration-150 transition-all'>Lupa Password?</a> */}
             <div className='mt-5'>
-              <Button color='info'>Masuk</Button>
+              <Button color='info'>Login</Button>
             </div>
           </form>
         </div>

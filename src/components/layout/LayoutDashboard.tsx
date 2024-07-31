@@ -16,7 +16,7 @@ export default function LayoutDashboard({ children }: { children: ReactNode }) {
     return (
         <section className='min-h-screen overflow-x-hidden relative'>
             <Head>
-                <title>Dashboard - Sistem Pakar Terintegrasi</title>
+                <title>Dashboard - StokInventory</title>
             </Head>
             <div className='lg:block hidden'>
                 <NavbarDesktop session={{name:"Admin"}}>

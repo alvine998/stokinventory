@@ -165,7 +165,7 @@ export default function Partner({ table }: any) {
     ]
     return (
         <div>
-            <h2 className='text-2xl font-semibold'>Mitra</h2>
+            <h2 className='text-2xl font-semibold'>Partner</h2>
 
             <div className='mt-5'>
                 <div className='flex lg:flex-row flex-col justify-between items-center'>
@@ -177,7 +177,7 @@ export default function Partner({ table }: any) {
                             setModal({ ...modal, open: true, data: null, key: "create" })
                         }}>
                             <PlusIcon className='w-4' />
-                            Mitra
+                            Partner
                         </Button>
                     </div>
                 </div>
