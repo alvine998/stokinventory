@@ -10,7 +10,7 @@ const nextConfig = {
     ],
   },
   env: {
-    BASE_URL_API_TOKOTITOH: 'https://api-sistempakar.tokotitoh.co.id'
+    BASE_URL_API_STOKINVENTORY: 'https://stokinventory-api.vercel.app'
   }
 }
 
