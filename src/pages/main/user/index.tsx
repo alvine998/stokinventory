@@ -78,6 +78,11 @@ export default function User({ table, session }: any) {
       selector: (row: any) => row?.email || "-",
     },
     {
+      name: "No Telepon",
+      sortable: true,
+      selector: (row: any) => row?.phone || "-",
+    },
+    {
       name: "Peran",
       sortable: true,
       selector: (row: any) =>
