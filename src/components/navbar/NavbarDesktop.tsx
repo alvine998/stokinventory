@@ -92,25 +92,26 @@ export default function NavbarDesktop({
     //   href: `/main/setting`,
     //   icon: <CogIcon />,
     // },
-    {
-      name: "Partner",
-      href: `/main/partner`,
-      icon: <HandshakeIcon />,
-    },
-  ];
+    session?.email?.includes("stokinventory.com") &&
+      session?.is_stokinv_admin == 1 && {
+        name: "Partner",
+        href: `/main/partner`,
+        icon: <HandshakeIcon />,
+      },
+  ]?.filter((v: any) => v !== undefined);
   return (
     <div>
       {/* Topbar */}
-      <div className="bg-blue-600 w-full h-10 flex justify-end items-center px-10">
+      <div className="bg-blue-200 w-full h-10 flex justify-end items-center px-10">
         {/* <button className='flex items-center gap-2'>
                    
                 </button> */}
         <Menu>
           <MenuButton className={"flex gap-2 items-center"}>
-            <p className="text-white">
+            <p className="text-blue-500">
               Hello, {session?.name?.toUpperCase() || "Admin"}
             </p>
-            <ChevronDownCircle color="white" className="w-4" />
+            <ChevronDownCircle color="blue" className="w-4" />
           </MenuButton>
           <Transition
             enter="transition ease-out duration-75"
@@ -144,12 +145,20 @@ export default function NavbarDesktop({
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="bg-blue-600 w-1/5 h-[100vh] absolute z-10 top-0 left-0 pt-2">
+        <div className="bg-blue-200 w-1/5 h-[100vh] absolute z-10 top-0 left-0 pt-2">
           <div className="flex justify-center items-center gap-5">
-            {/* <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' /> */}
-            <h2 className="text-white text-2xl text-center">
-              StokInventory
-            </h2>
+            {session?.logo ? (
+              <Image
+                alt="logo"
+                src={session?.logo}
+                layout="relative"
+                width={150}
+                height={150}
+                className="w-30 h-30"
+              />
+            ) : (
+              <h2 className="text-blue-500 text-2xl text-center">StokInventory</h2>
+            )}
           </div>
           <div className="flex flex-col mt-5">
             {navs?.map((v: any) => (
@@ -158,7 +167,7 @@ export default function NavbarDesktop({
                 className={
                   router.pathname == v?.href
                     ? "text-xl flex gap-2 bg-white p-2 text-blue-500 pl-2"
-                    : "text-white text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-2"
+                    : "text-black text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-2"
                 }
                 type="button"
                 onClick={() => {

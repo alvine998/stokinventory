@@ -48,12 +48,12 @@ export default function NavbarMobile({ children, session }: { children: ReactNod
         //     href: `/main/setting`,
         //     icon: <CogIcon />,
         //   },
-          {
+        session?.email?.includes("stokinventory.com") && session?.is_stokinv_admin == 1 && {
             name: "Akses Admin",
             href: `/main/user`,
             icon: <Users2Icon />,
           },
-    ]
+    ]?.filter((v:any) => v !== undefined)
     return (
         <div className='overflow-hidden'>
             {/* Topbar */}

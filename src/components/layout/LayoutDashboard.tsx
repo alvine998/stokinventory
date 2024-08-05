@@ -7,10 +7,13 @@ import { getCookie } from 'cookies-next'
 
 export default function LayoutDashboard({ children }: { children: ReactNode }) {
     const router = useRouter();
-    // let sessions: any = "{name:'Admin'}"
+    let sessions: any = getCookie("session")
+    if(sessions){
+        sessions = JSON.parse(sessions)
+    }
     // useEffect(() => {
-    //     if (!sessions) {
-    //         router.push("/")
+    //     if (sessions) {
+    //         sessions = JSON.parse(sessions)
     //     }
     // }, [])
     return (
@@ -19,12 +22,12 @@ export default function LayoutDashboard({ children }: { children: ReactNode }) {
                 <title>Dashboard - StokInventory</title>
             </Head>
             <div className='lg:block hidden'>
-                <NavbarDesktop session={{name:"Admin"}}>
+                <NavbarDesktop session={sessions}>
                     {children}
                 </NavbarDesktop>
             </div>
             <div className='lg:hidden block'>
-                <NavbarMobile session={{name:"Admin"}}>
+                <NavbarMobile session={sessions}>
                     {children}
                 </NavbarMobile>
             </div>
