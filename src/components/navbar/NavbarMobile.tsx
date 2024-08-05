@@ -95,14 +95,25 @@ export default function NavbarMobile({
   return (
     <div className="overflow-hidden">
       {/* Topbar */}
-      <div className="bg-blue-600 w-full h-14 flex items-center px-2">
+      <div className="bg-blue-200 w-full h-14 flex items-center px-2">
         <Menu>
           <MenuButton
             className={"flex gap-2 items-center justify-between w-full"}
           >
+            {session?.logo ? (
+              <Image
+                alt="logo"
+                src={session?.logo}
+                layout="relative"
+                width={100}
+                height={100}
+                className="w-15 h-15"
+              />
+            ) : (
+              <p className="text-white text-xl">StokInventory</p>
+            )}
             {/* <Image alt='logo' src={'/images/tokotitoh.png'} layout='relative' width={300} height={300} className='w-10 h-10' /> */}
-            <p className="text-white text-xl">StokInventory</p>
-            <MenuIcon color="white" className="w-7" />
+            <MenuIcon color="blue" className="w-7" />
           </MenuButton>
           <Transition
             enter="transition ease-out duration-75"
@@ -122,7 +133,7 @@ export default function NavbarMobile({
                     type="button"
                     className={
                       router?.pathname?.includes(v?.href)
-                        ? "group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 bg-blue-600 text-white"
+                        ? "group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 bg-blue-200 text-blue-500"
                         : `group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 bg-white ${
                             v?.name == "Logout" ? "text-red-500" : "text-black"
                           }`
