@@ -302,7 +302,6 @@ export default function Medicine({ table, session }: any) {
                 name="stock"
                 defaultValue={modal?.data?.stock || ""}
                 type="number"
-                required
               />
               <Input
                 isCurrency
@@ -318,7 +317,6 @@ export default function Medicine({ table, session }: any) {
                 name="moq"
                 defaultValue={modal?.data?.moq || ""}
                 type="number"
-                required
               />
               <Input
                 label="Satuan"

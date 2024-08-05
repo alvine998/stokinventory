@@ -6,6 +6,7 @@ import Radio from "@/components/Radio";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
 import { CONFIG } from "@/config";
 import axios from "axios";
+import { getCookie } from "cookies-next";
 import {
   PencilIcon,
   PlusIcon,
@@ -13,25 +14,50 @@ import {
   Trash2Icon,
   TrashIcon,
   UploadCloudIcon,
+  XCircleIcon,
 } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
+import ReactSelect from "react-select";
 import Swal from "sweetalert2";
 
 export async function getServerSideProps(context: any) {
   try {
-    const { page, limit, search } = context.query;
+    const { page, size, search } = context.query;
+    const { req, res } = context;
+    let session: any = getCookie("session", { req, res });
+    if (session) {
+      session = JSON.parse(session);
+    }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/diseases/list?page=${+page || 1}&limit=${+limit || 10}&search=${
+        `/stocks?page=${+page || 1}&size=${+size || 10}&search=${search || ""}`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
+    );
+    const products = await axios.get(
+      CONFIG.base_url_api +
+        `/products?page=${+page || 1}&size=${+size || 10}&search=${
           search || ""
-        }`
+        }`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
     );
     return {
       props: {
         table: result?.data || [],
+        products: products.data?.items || [],
+        session,
       },
     };
   } catch (error: any) {
@@ -44,15 +70,16 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table }: any) {
+export default function Medicine({ table, session, products }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [list, setList] = useState<any>([]);
   const [image, setImage] = useState<any>({
-    data:"",
-    preview: ""
-  })
+    data: "",
+    preview: "",
+  });
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -71,12 +98,17 @@ export default function Medicine({ table }: any) {
     {
       name: "Jenis Stok",
       sortable: true,
-      selector: (row: any) => row?.type == "in" ? "Barang Masuk" : "Barang Keluar",
+      selector: (row: any) =>
+        row?.type == "in" ? "Barang Masuk" : "Barang Keluar",
     },
     {
       name: "Bukti",
       sortable: true,
-      selector: (row: any) => <a href={row?.image} className="text-blue-500" >Lihat</a>,
+      selector: (row: any) => (
+        <a href={row?.image} className="text-blue-500">
+          Lihat
+        </a>
+      ),
     },
     {
       name: "Aksi",
@@ -115,15 +147,19 @@ export default function Medicine({ table }: any) {
       };
       let result: any = null;
       if (formData?.id) {
-        result = await axios.patch(
-          CONFIG.base_url_api + `/diseases/update/${formData?.id}`,
-          payload
-        );
+        result = await axios.patch(CONFIG.base_url_api + `/stock`, payload, {
+          headers: {
+            "bearer-token": "stokinventoryapi",
+            "x-partner-code": session?.partner_code,
+          },
+        });
       } else {
-        result = await axios.post(
-          CONFIG.base_url_api + `/diseases/create`,
-          payload
-        );
+        result = await axios.post(CONFIG.base_url_api + `/stock`, payload, {
+          headers: {
+            "bearer-token": "stokinventoryapi",
+            "x-partner-code": session?.partner_code,
+          },
+        });
       }
       if (result.data[1] == 400) {
         Swal.fire({
@@ -151,7 +187,13 @@ export default function Medicine({ table }: any) {
       e?.preventDefault();
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
-        CONFIG.base_url_api + `/diseases/delete/${formData?.id}`
+        CONFIG.base_url_api + `/stock?id=${formData?.id}`,
+        {
+          headers: {
+            "bearer-token": "stokinventoryapi",
+            "x-partner-code": session?.partner_code,
+          },
+        }
       );
       Swal.fire({
         icon: "success",
@@ -165,7 +207,7 @@ export default function Medicine({ table }: any) {
   };
   return (
     <div>
-      <h2 className="text-2xl font-semibold">Stock Opname (SO)</h2>
+      <h2 className="text-2xl font-semibold">Stock</h2>
 
       <div className="mt-5">
         <div className="flex lg:flex-row flex-col justify-between items-center">
@@ -204,7 +246,7 @@ export default function Medicine({ table }: any) {
                 setFilter({ ...filter, page: pageData });
               }}
               onChangeRowsPerPage={(currentRow, currentPage) => {
-                setFilter({ ...filter, page: currentPage, limit: currentRow });
+                setFilter({ ...filter, page: currentPage, size: currentRow });
               }}
               responsive={true}
               paginationTotalRows={table?.total_items}
@@ -233,6 +275,56 @@ export default function Medicine({ table }: any) {
                   value={modal?.data?.id || null}
                 />
               )}
+              <div>
+                <label htmlFor="products" className="text-gray-500">
+                  Produk
+                </label>
+                <ReactSelect
+                  id="products"
+                  options={products
+                    ?.filter((v: any) => {
+                      if (list?.product) {
+                        let prod = list?.product?.map((val: any) => val?.id);
+                        !prod.includes(v?.id);
+                      }
+                    })
+                    ?.map((v: any) => ({
+                      ...v,
+                      value: v.id,
+                      label: v.name,
+                    }))}
+                  placeholder="Pilih Produk"
+                  onChange={(e) => {
+                    setList({
+                      product:
+                        list?.product?.length > 0 ? [...list?.product, e] : [e],
+                    });
+                  }}
+                />
+              </div>
+              {list?.product?.map((v: any, i: number) => (
+                <div key={i} className="mt-2 flex justify-between gap-2">
+                  <Input value={v.label} label="" disabled />
+                  <Input
+                    value={v.stock}
+                    isCurrency
+                    label=""
+                    placeholder="Masukkan Jumlah"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setList({
+                        product: list?.product?.filter(
+                          (val: any) => val?.id !== v?.id
+                        ),
+                      });
+                    }}
+                  >
+                    <XCircleIcon className="text-red-500 w-7" />
+                  </button>
+                </div>
+              ))}
               <Radio
                 id="radio1"
                 name="type"
@@ -240,12 +332,12 @@ export default function Medicine({ table }: any) {
                   {
                     name: "Barang Masuk",
                     value: "in",
-                    checked: modal?.data?.type == "in" || true
+                    checked: modal?.data?.type == "in" || true,
                   },
                   {
                     name: "Barang Keluar",
                     value: "out",
-                    checked: modal?.data?.type == "out"
+                    checked: modal?.data?.type == "out",
                   },
                 ]}
                 label="Jenis Stok"
@@ -259,13 +351,22 @@ export default function Medicine({ table }: any) {
                 type="datetime-local"
                 required
               />
-              <FileUpload image={image} label="Bukti" onChange={(e: any)=>{
-                const file = e.target.files
-                if(file){
-                  console.log(file);
-                  setImage({data: file[0], preview: URL.createObjectURL(file[0])})
-                }
-              }} name="image" defaultValue={image?.data || ""} />
+              <FileUpload
+                image={image}
+                label="Bukti"
+                onChange={(e: any) => {
+                  const file = e.target.files;
+                  if (file) {
+                    console.log(file);
+                    setImage({
+                      data: file[0],
+                      preview: URL.createObjectURL(file[0]),
+                    });
+                  }
+                }}
+                name="image"
+                defaultValue={image?.data || ""}
+              />
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
                 <div>
                   <Button

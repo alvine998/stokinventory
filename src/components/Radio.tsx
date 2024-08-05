@@ -16,7 +16,7 @@ interface RadioValue {
 export default function Radio(props: Props) {
   const { options, label, name, id } = props;
   return (
-    <div>
+    <div className="mt-2">
       <label htmlFor={id} className="text-gray-500">{label}</label>
       <div className=" flex justify-between border">
         {options?.map((v: RadioValue, i: number) => (

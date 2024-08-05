@@ -63,11 +63,6 @@ export default function NavbarDesktop({
       icon: <StoreIcon />,
     },
     {
-      name: "Produk Kadaluwarsa",
-      href: `/main/expired`,
-      icon: <TriangleAlertIcon />,
-    },
-    {
       name: "Stock",
       href: `/main/so`,
       icon: <ArrowLeftRightIcon />,
@@ -81,6 +76,11 @@ export default function NavbarDesktop({
       name: "Delivery",
       href: `/main/do`,
       icon: <ArchiveRestoreIcon />,
+    },
+    {
+      name: "Produk Kadaluwarsa",
+      href: `/main/expired`,
+      icon: <TriangleAlertIcon />,
     },
     {
       name: "Akses Admin",

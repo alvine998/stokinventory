@@ -61,11 +61,6 @@ export default function NavbarMobile({
       icon: <StoreIcon />,
     },
     {
-      name: "Produk Kadaluwarsa",
-      href: `/main/expired`,
-      icon: <TriangleAlertIcon />,
-    },
-    {
       name: "Order",
       href: `/main/po`,
       icon: <ClipboardListIcon />,
@@ -74,6 +69,11 @@ export default function NavbarMobile({
       name: "Delivery",
       href: `/main/do`,
       icon: <ArchiveRestoreIcon />,
+    },
+    {
+      name: "Produk Kadaluwarsa",
+      href: `/main/expired`,
+      icon: <TriangleAlertIcon />,
     },
     {
       name: "Akses Admin",

@@ -6,15 +6,16 @@ type Props = InputHTMLAttributes<HTMLInputElement> & {
   isCurrency?: boolean;
   defaultValue?: any;
   name?: any;
+  isOptional?: boolean;
 };
 
 export default function Input(props: Props) {
-  const { label, isCurrency, defaultValue, name } = props;
+  const { label, isCurrency, defaultValue, name, isOptional } = props;
   return (
     <div className="my-2 flex flex-col w-full">
       {label && (
         <label htmlFor={label} className="text-gray-500">
-          {label}
+          {label} {isOptional && <strong className="text-xs text-orange-500" >(Optional)</strong>}
         </label>
       )}
       {isCurrency ? (

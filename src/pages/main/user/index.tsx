@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
+import ReactSelect from "react-select";
 import Swal from "sweetalert2";
 
 export async function getServerSideProps(context: any) {
@@ -27,9 +28,7 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/users?page=${+page || 1}&size=${+size || 10}&search=${
-          search || ""
-        }`,
+        `/users?page=${+page || 1}&size=${+size || 10}&search=${search || ""}`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -40,6 +39,7 @@ export async function getServerSideProps(context: any) {
     return {
       props: {
         table: result?.data || [],
+        session,
       },
     };
   } catch (error: any) {
@@ -52,7 +52,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function User({ table }: any) {
+export default function User({ table, session }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
@@ -78,9 +78,14 @@ export default function User({ table }: any) {
       selector: (row: any) => row?.email || "-",
     },
     {
-        name: "Peran",
-        sortable: true,
-        selector: (row: any) => row?.role == 'super_admin' ? "SUPER ADMIN" : row?.role == 'admin_warehouse' ? "ADMIN GUDANG" : "ADMIN TOKO"
+      name: "Peran",
+      sortable: true,
+      selector: (row: any) =>
+        row?.role == "super_admin"
+          ? "SUPER ADMIN"
+          : row?.role == "admin_warehouse"
+          ? "ADMIN GUDANG"
+          : "ADMIN TOKO",
     },
     {
       name: "Status",
@@ -124,13 +129,25 @@ export default function User({ table }: any) {
       };
       if (formData?.id) {
         const result = await axios.patch(
-          CONFIG.base_url_api + `/users/update/${payload?.id}`,
-          payload
+          CONFIG.base_url_api + `/user`,
+          payload,
+          {
+            headers: {
+              "bearer-token": "stokinventoryapi",
+              "x-partner-code": session?.partner_code,
+            },
+          }
         );
       } else {
         const result = await axios.post(
-          CONFIG.base_url_api + `/users/register`,
-          payload
+          CONFIG.base_url_api + `/user`,
+          payload,
+          {
+            headers: {
+              "bearer-token": "stokinventoryapi",
+              "x-partner-code": session?.partner_code,
+            },
+          }
         );
       }
       Swal.fire({
@@ -148,7 +165,13 @@ export default function User({ table }: any) {
       e?.preventDefault();
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
-        CONFIG.base_url_api + `/users/delete/${formData?.id}`
+        CONFIG.base_url_api + `/user?id=${formData?.id}`,
+        {
+          headers: {
+            "bearer-token": "stokinventoryapi",
+            "x-partner-code": session?.partner_code,
+          },
+        }
       );
       Swal.fire({
         icon: "success",
@@ -245,6 +268,13 @@ export default function User({ table }: any) {
                 defaultValue={modal?.data?.email || ""}
               />
               <Input
+                label="No Telepon"
+                placeholder="Masukkan No Telepon"
+                name="phone"
+                type="number"
+                defaultValue={modal?.data?.phone || ""}
+              />
+              <Input
                 label="Password"
                 placeholder="Masukkan Password"
                 name="password"
@@ -252,19 +282,30 @@ export default function User({ table }: any) {
                 defaultValue={""}
                 required={modal.key == "create"}
               />
-              {/* <div className='w-full my-2'>
-                                <label className='text-gray-500' htmlFor="x">Peran</label>
-                                <div className='flex gap-5'>
-                                    <div className='flex gap-2'>
-                                        <input type='radio' name='role' value={'user'} defaultChecked={modal?.data?.role == 'user'} />
-                                        <span>User</span>
-                                    </div>
-                                    <div className='flex gap-2'>
-                                        <input type='radio' name='role' value={'admin'} defaultChecked={modal?.data?.role == 'admin'} />
-                                        <span>Admin</span>
-                                    </div>
-                                </div>
-                            </div> */}
+              <div>
+                <label htmlFor="role" className="text-gray-500">
+                  Peran
+                </label>
+                <ReactSelect
+                  id="role"
+                  menuPlacement="top"
+                  options={[
+                    {
+                      value: "super_admin",
+                      label: "Super Admin",
+                    },
+                    {
+                      value: "admin_warehouse",
+                      label: "Admin Gudang",
+                    },
+                    {
+                      value: "admin_store",
+                      label: "Admin Toko",
+                    },
+                  ]}
+                  defaultValue={{ value: "super_admin", label: "Super Admin" }}
+                />
+              </div>
               {modal.key == "update" ? (
                 <div>
                   <div className="w-full my-2">
