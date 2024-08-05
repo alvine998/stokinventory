@@ -68,17 +68,17 @@ export default function NavbarDesktop({
       icon: <TriangleAlertIcon />,
     },
     {
-      name: "Stock Opname (SO)",
+      name: "Stock",
       href: `/main/so`,
       icon: <ArrowLeftRightIcon />,
     },
     {
-      name: "Purchase Order (PO)",
+      name: "Order",
       href: `/main/po`,
       icon: <ClipboardListIcon />,
     },
     {
-      name: "Delivery Order (DO)",
+      name: "Delivery",
       href: `/main/do`,
       icon: <ArchiveRestoreIcon />,
     },

@@ -23,7 +23,8 @@ export default function Input(props: Props) {
           defaultValue={defaultValue}
           name={name}
           id={name}
-          thousandSeparator
+          thousandSeparator="."
+          decimalSeparator=","
           placeholder="0"
         />
       ) : (

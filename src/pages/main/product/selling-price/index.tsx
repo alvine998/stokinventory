@@ -3,7 +3,9 @@ import Input from "@/components/Input";
 import Modal, { useModal } from "@/components/Modal";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
 import { CONFIG } from "@/config";
+import { toMoney } from "@/utils";
 import axios from "axios";
+import { getCookie } from "cookies-next";
 import {
   ArrowLeftCircle,
   PencilIcon,
@@ -19,12 +21,23 @@ import Swal from "sweetalert2";
 
 export async function getServerSideProps(context: any) {
   try {
-    const { page, limit, search } = context.query;
+    const { page, size, search } = context.query;
+    const { req, res } = context;
+    let session: any = getCookie("session", { req, res });
+    if (session) {
+      session = JSON.parse(session);
+    }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/medicines/list?page=${+page || 1}&limit=${+limit || 10}&search=${
+        `/products?page=${+page || 1}&size=${+size || 10}&search=${
           search || ""
-        }`
+        }`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
     );
     return {
       props: {
@@ -59,7 +72,7 @@ export default function Medicine({ table }: any) {
     {
       name: "Kode",
       sortable: true,
-      selector: (row: any) => row?.dose || "-",
+      selector: (row: any) => row?.code || "-",
     },
     {
       name: "Nama Produk",
@@ -69,27 +82,27 @@ export default function Medicine({ table }: any) {
     {
       name: "Harga Modal",
       sortable: true,
-      selector: (row: any) => row?.dose || "-",
+      selector: (row: any) => toMoney(row?.price) || "-",
     },
     {
       name: "40%",
       sortable: true,
-      selector: (row: any) => row?.stock || "0",
+      selector: (row: any) => toMoney((row?.price * 0.4) + row?.price) || "0",
     },
     {
       name: "50%",
       sortable: true,
-      selector: (row: any) => row?.capital_price || "0",
+      selector: (row: any) => toMoney((row?.price * 0.5) + row?.price) || "0",
     },
     {
       name: "60%",
       sortable: true,
-      selector: (row: any) => row?.moq || "0",
+      selector: (row: any) => toMoney((row?.price * 0.6) + row?.price) || "0",
     },
     {
       name: "70%",
       sortable: true,
-      selector: (row: any) => row?.moq || "0",
+      selector: (row: any) => toMoney((row?.price * 0.7) + row?.price) || "0",
     },
   ];
 

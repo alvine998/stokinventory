@@ -3,7 +3,9 @@ import Input from "@/components/Input";
 import Modal, { useModal } from "@/components/Modal";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
 import { CONFIG } from "@/config";
+import { toMoney } from "@/utils";
 import axios from "axios";
+import { getCookie } from "cookies-next";
 import {
   ClipboardList,
   PencilIcon,
@@ -19,16 +21,28 @@ import Swal from "sweetalert2";
 
 export async function getServerSideProps(context: any) {
   try {
-    const { page, limit, search } = context.query;
+    const { page, size, search } = context.query;
+    const { req, res } = context;
+    let session: any = getCookie("session", { req, res });
+    if (session) {
+      session = JSON.parse(session);
+    }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/medicines/list?page=${+page || 1}&limit=${+limit || 10}&search=${
+        `/products?page=${+page || 1}&size=${+size || 10}&search=${
           search || ""
-        }`
+        }`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
     );
     return {
       props: {
         table: result?.data || [],
+        session
       },
     };
   } catch (error: any) {
@@ -41,7 +55,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table }: any) {
+export default function Medicine({ table, session }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
@@ -64,22 +78,22 @@ export default function Medicine({ table }: any) {
     {
       name: "Kode",
       sortable: true,
-      selector: (row: any) => row?.dose || "-",
+      selector: (row: any) => row?.code || "-",
     },
     {
       name: "Stok",
       sortable: true,
-      selector: (row: any) => row?.stock || "0",
+      selector: (row: any) => `${row?.stock || "0"} ${row?.unit}`,
     },
     {
       name: "Harga Modal",
       sortable: true,
-      selector: (row: any) => row?.capital_price || "0",
+      selector: (row: any) => toMoney(row?.price) || "0",
     },
     {
       name: "Min Order",
       sortable: true,
-      selector: (row: any) => row?.moq || "0",
+      selector: (row: any) => `${row?.moq || "0"} ${row?.unit}`,
     },
     {
       name: "Aksi",
@@ -109,48 +123,75 @@ export default function Medicine({ table }: any) {
     },
   ];
 
+  const [loading, setLoading] = useState<boolean>(false)
+
   const onSubmit = async (e: any) => {
     e?.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target));
+    setLoading(true)
+    const formData: any = Object.fromEntries(new FormData(e.target));
     try {
       const payload = {
         ...formData,
+        price: formData?.price?.replaceAll(".", "")
       };
       if (formData?.id) {
         const result = await axios.patch(
-          CONFIG.base_url_api + `/medicines/update/${formData?.id}`,
-          payload
+          CONFIG.base_url_api + `/product`,
+          payload,
+          {
+            headers: {
+              "bearer-token": "stokinventoryapi",
+              "x-partner-code": session?.partner_code,
+            },
+          }
         );
       } else {
         const result = await axios.post(
-          CONFIG.base_url_api + `/medicines/create`,
-          payload
+          CONFIG.base_url_api + `/product`,
+          payload,
+          {
+            headers: {
+              "bearer-token": "stokinventoryapi",
+              "x-partner-code": session?.partner_code,
+            },
+          }
         );
       }
       Swal.fire({
         icon: "success",
         text: "Data Berhasil Disimpan",
       });
+      setLoading(false)
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   };
   const onRemove = async (e: any) => {
     try {
       e?.preventDefault();
+      setLoading(true)
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
-        CONFIG.base_url_api + `/medicines/delete/${formData?.id}`
+        CONFIG.base_url_api + `/product?id=${formData?.id}`,
+        {
+          headers: {
+            "bearer-token": "stokinventoryapi",
+            "x-partner-code": session?.partner_code,
+          },
+        }
       );
       Swal.fire({
         icon: "success",
         text: "Data Berhasil Dihapus",
       });
+      setLoading(false)
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   };
@@ -180,7 +221,7 @@ export default function Medicine({ table }: any) {
                   "flex gap-2 px-2 items-center lg:justify-start justify-center"
                 }
                 onClick={() => {
-                  router.push(`/main/product/selling-price`)
+                  router.push(`/main/product/selling-price`);
                 }}
               >
                 <ClipboardList className="w-4" />
@@ -212,7 +253,7 @@ export default function Medicine({ table }: any) {
                 setFilter({ ...filter, page: pageData });
               }}
               onChangeRowsPerPage={(currentRow, currentPage) => {
-                setFilter({ ...filter, page: currentPage, limit: currentRow });
+                setFilter({ ...filter, page: currentPage, size: currentRow });
               }}
               responsive={true}
               paginationTotalRows={table?.total_items}
@@ -267,8 +308,8 @@ export default function Medicine({ table }: any) {
                 isCurrency
                 label="Harga Modal"
                 placeholder="Masukkan Harga Modal"
-                name="capital_price"
-                defaultValue={modal?.data?.capital_price || ""}
+                name="price"
+                defaultValue={modal?.data?.price || ""}
                 required
               />
               <Input
@@ -277,6 +318,13 @@ export default function Medicine({ table }: any) {
                 name="moq"
                 defaultValue={modal?.data?.moq || ""}
                 type="number"
+                required
+              />
+              <Input
+                label="Satuan"
+                placeholder="Kg/Pcs/Ons/dll"
+                name="unit"
+                defaultValue={modal?.data?.unit || ""}
                 required
               />
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
@@ -296,9 +344,10 @@ export default function Medicine({ table }: any) {
                   <Button
                     color="info"
                     className={"flex gap-2 px-2 items-center justify-center"}
+                    disabled={loading}
                   >
                     <SaveAllIcon className="w-4 h-4" />
-                    Simpan
+                    {loading ? "Menyimpan..." : "Simpan"}
                   </Button>
                 </div>
               </div>
@@ -313,12 +362,12 @@ export default function Medicine({ table }: any) {
             setOpen={() => setModal({ ...modal, open: false })}
           >
             <h2 className="text-xl font-semibold text-center">
-              Hapus Data Obat
+              Hapus Data Produk
             </h2>
             <form onSubmit={onRemove}>
               <input type="hidden" name="id" value={modal?.data?.id} />
               <p className="text-center my-2">
-                Apakah anda yakin ingin menghapus data {modal?.data?.name}?
+                Apakah anda yakin ingin menghapus produk {modal?.data?.name}?
               </p>
               <div className="flex gap-2 lg:flex-row flex-col-reverse justify-end">
                 <div>
@@ -337,9 +386,10 @@ export default function Medicine({ table }: any) {
                   <Button
                     color="danger"
                     className={"flex gap-2 px-2 items-center justify-center"}
+                    disabled={loading}
                   >
                     <Trash2Icon className="w-4 h-4" />
-                    Hapus
+                    {loading? "Menghapus..." : "Hapus"}
                   </Button>
                 </div>
               </div>
