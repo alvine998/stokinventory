@@ -76,7 +76,7 @@ export default function NavbarMobile({
       href: `/main/expired`,
       icon: <TriangleAlertIcon />,
     },
-    session?.role == "super_admin" && {
+    {
       name: "Daftar Resep",
       href: `/main/recipe`,
       icon: <ClipboardCheckIcon />,
@@ -97,7 +97,7 @@ export default function NavbarMobile({
         href: `/main/user`,
         icon: <Users2Icon />,
       },
-  ]?.filter((v: any) => v !== undefined);
+  ]?.filter((v: any) => v !== false);
   return (
     <div className="overflow-hidden">
       {/* Topbar */}

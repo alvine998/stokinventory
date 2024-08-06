@@ -211,6 +211,20 @@ export default function User({ table, session }: any) {
       console.log(error);
     }
   };
+  const roles = [
+    {
+      value: "super_admin",
+      label: "Super Admin",
+    },
+    {
+      value: "admin_warehouse",
+      label: "Admin Gudang",
+    },
+    {
+      value: "admin_store",
+      label: "Admin Toko",
+    },
+  ]
   return (
     <div>
       <h2 className="text-2xl font-semibold">Akses Admin</h2>
@@ -318,21 +332,8 @@ export default function User({ table, session }: any) {
                   id="role"
                   menuPlacement="top"
                   name="role"
-                  options={[
-                    {
-                      value: "super_admin",
-                      label: "Super Admin",
-                    },
-                    {
-                      value: "admin_warehouse",
-                      label: "Admin Gudang",
-                    },
-                    {
-                      value: "admin_store",
-                      label: "Admin Toko",
-                    },
-                  ]}
-                  defaultValue={{ value: "super_admin", label: "Super Admin" }}
+                  options={roles}
+                  defaultValue={roles?.find((v:any) => v.value == modal?.data?.role) || roles[0]}
                 />
               </div>
               <Radio

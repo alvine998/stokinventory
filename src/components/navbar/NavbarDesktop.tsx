@@ -83,7 +83,7 @@ export default function NavbarDesktop({
       href: `/main/expired`,
       icon: <TriangleAlertIcon />,
     },
-    session?.role == "super_admin" && {
+    {
       name: "Daftar Resep",
       href: `/main/recipe`,
       icon: <ClipboardCheckIcon />,
@@ -104,7 +104,8 @@ export default function NavbarDesktop({
         href: `/main/partner`,
         icon: <HandshakeIcon />,
       },
-  ]?.filter((v: any) => v !== undefined);
+  ]?.filter((v: any) => v !== false);
+  console.log(navs);
   return (
     <div>
       {/* Topbar */}

@@ -42,7 +42,7 @@ export async function getServerSideProps(context: any) {
     return {
       props: {
         table: result?.data || [],
-        session
+        session,
       },
     };
   } catch (error: any) {
@@ -71,19 +71,24 @@ export default function Medicine({ table, session }: any) {
   }, [filter]);
   const CustomerColumn: any = [
     {
-      name: "Nama Produk",
+      name: "Nama Menu",
       sortable: true,
-      selector: (row: any) => row?.name,
+      selector: (row: any) => row?.name || "-",
     },
     {
-      name: "Kode",
+      name: "Bahan-bahan",
       sortable: true,
-      selector: (row: any) => row?.code || "-",
-    },
-    {
-      name: "Stok",
-      sortable: true,
-      selector: (row: any) => `${row?.stock || "0"} ${row?.unit}`,
+      selector: (row: any) => (
+        <button
+          className="text-center text-blue-500"
+          type="button"
+          onClick={() => {
+            setModal({ ...modal, open: true, key: "view", data: row });
+          }}
+        >
+          Lihat
+        </button>
+      ),
     },
     {
       name: "Harga Modal",
@@ -91,11 +96,21 @@ export default function Medicine({ table, session }: any) {
       selector: (row: any) => toMoney(row?.price) || "0",
     },
     {
-      name: "Min Order",
+      name: "Keterangan",
       sortable: true,
-      selector: (row: any) => `${row?.moq || "0"} ${row?.unit}`,
+      selector: (row: any) => row?.remarks || "-",
     },
     {
+      name: "Status",
+      sortable: true,
+      selector: (row: any) =>
+        row?.status == 1 ? (
+          <p className="text-center text-green-500">Available</p>
+        ) : (
+          <p className="text-center text-red-500">Not Available</p>
+        ),
+    },
+    session?.role !== "admin_store" && {
       name: "Aksi",
       right: true,
       selector: (row: any) => (
@@ -121,18 +136,18 @@ export default function Medicine({ table, session }: any) {
         </div>
       ),
     },
-  ];
+  ]?.filter((v:any) => v !== false);
 
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit = async (e: any) => {
     e?.preventDefault();
-    setLoading(true)
+    setLoading(true);
     const formData: any = Object.fromEntries(new FormData(e.target));
     try {
       const payload = {
         ...formData,
-        price: formData?.price?.replaceAll(".", "")
+        price: formData?.price?.replaceAll(".", ""),
       };
       if (formData?.id) {
         const result = await axios.patch(
@@ -161,18 +176,18 @@ export default function Medicine({ table, session }: any) {
         icon: "success",
         text: "Data Berhasil Disimpan",
       });
-      setLoading(false)
+      setLoading(false);
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error);
     }
   };
   const onRemove = async (e: any) => {
     try {
       e?.preventDefault();
-      setLoading(true)
+      setLoading(true);
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
         CONFIG.base_url_api + `/product?id=${formData?.id}`,
@@ -187,11 +202,11 @@ export default function Medicine({ table, session }: any) {
         icon: "success",
         text: "Data Berhasil Dihapus",
       });
-      setLoading(false)
+      setLoading(false);
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error);
     }
   };
@@ -229,19 +244,28 @@ export default function Medicine({ table, session }: any) {
               </Button>
             </div> */}
             <div className="w-auto">
-              <Button
-                type="button"
-                color="info"
-                className={
-                  "flex gap-2 px-2 items-center lg:justify-start justify-center"
-                }
-                onClick={() => {
-                  setModal({ ...modal, open: true, data: null, key: "create" });
-                }}
-              >
-                <PlusIcon className="w-4" />
-                Resep
-              </Button>
+              {session?.role !== "admin_store" ? (
+                <Button
+                  type="button"
+                  color="info"
+                  className={
+                    "flex gap-2 px-2 items-center lg:justify-start justify-center"
+                  }
+                  onClick={() => {
+                    setModal({
+                      ...modal,
+                      open: true,
+                      data: null,
+                      key: "create",
+                    });
+                  }}
+                >
+                  <PlusIcon className="w-4" />
+                  Resep
+                </Button>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
@@ -387,7 +411,7 @@ export default function Medicine({ table, session }: any) {
                     disabled={loading}
                   >
                     <Trash2Icon className="w-4 h-4" />
-                    {loading? "Menghapus..." : "Hapus"}
+                    {loading ? "Menghapus..." : "Hapus"}
                   </Button>
                 </div>
               </div>
