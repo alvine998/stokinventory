@@ -171,10 +171,11 @@ export default function User({ table, session }: any) {
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error: any) {
+      let errors = error?.response?.data
       setInfo({
         ...info,
         loading: false,
-        error_message: error?.response?.data?.error_message,
+        error_message: errors?.error_message || errors?.message,
       });
       console.log(error);
     }
@@ -201,10 +202,11 @@ export default function User({ table, session }: any) {
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error: any) {
+      let errors = error?.response?.data
       setInfo({
         ...info,
         loading: false,
-        error_message: error?.response?.data?.error_message,
+        error_message: errors?.error_message || errors?.message,
       });
       console.log(error);
     }
@@ -383,7 +385,7 @@ export default function User({ table, session }: any) {
               )}
               {
                 info.error_message ? 
-                <div className="p-2 w-full bg-red-200 rounded my-2 flex items-center gap-2">
+                <div className="p-2 w-full bg-red-200 rounded my-2 flex items-center gap-3">
                   <TriangleAlert className="text-red-500" />
                   <p className="text-red-500">{info.error_message}</p>
                 </div> : ""
@@ -430,6 +432,13 @@ export default function User({ table, session }: any) {
               <p className="text-center my-2">
                 Apakah anda yakin ingin menghapus data {modal?.data?.name}?
               </p>
+              {
+                info.error_message && modal.key == "delete" ? 
+                <div className="p-2 w-full bg-red-200 rounded my-2 flex items-center gap-3">
+                  <TriangleAlert className="text-red-500" />
+                  <p className="text-red-500">{info.error_message}</p>
+                </div> : ""
+              }
               <div className="flex gap-2 lg:flex-row flex-col-reverse justify-end">
                 <div>
                   <Button
