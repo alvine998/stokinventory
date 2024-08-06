@@ -105,7 +105,6 @@ export default function NavbarDesktop({
         icon: <HandshakeIcon />,
       },
   ]?.filter((v: any) => v !== false);
-  console.log(navs);
   return (
     <div>
       {/* Topbar */}

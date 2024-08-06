@@ -75,7 +75,8 @@ export default function Medicine({ table, session, products }: any) {
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
-  const [list, setList] = useState<any>([]);
+  const [list, setList] = useState<any>({ product: [] });
+  const [product, setProduct] = useState<any>(products);
   const [image, setImage] = useState<any>({
     data: "",
     preview: "",
@@ -281,24 +282,22 @@ export default function Medicine({ table, session, products }: any) {
                 </label>
                 <ReactSelect
                   id="products"
-                  options={products
-                    ?.filter((v: any) => {
-                      if (list?.product) {
-                        let prod = list?.product?.map((val: any) => val?.id);
-                        !prod.includes(v?.id);
-                      }
-                    })
-                    ?.map((v: any) => ({
-                      ...v,
-                      value: v.id,
-                      label: v.name,
-                    }))}
+                  options={product?.map((v: any) => ({
+                    ...v,
+                    value: v.id,
+                    label: v.name,
+                  }))}
                   placeholder="Pilih Produk"
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     setList({
                       product:
-                        list?.product?.length > 0 ? [...list?.product, e] : [e],
+                        list?.product?.length > 0
+                          ? [...list?.product, e]
+                          : [e],
                     });
+                    setProduct(
+                      product?.filter((val: any) => val?.id !== e?.value)
+                    );
                   }}
                 />
               </div>
@@ -319,6 +318,10 @@ export default function Medicine({ table, session, products }: any) {
                           (val: any) => val?.id !== v?.id
                         ),
                       });
+                      setProduct([
+                        ...product,
+                        products?.find((val: any) => val?.id == v?.id),
+                      ]);
                     }}
                   >
                     <XCircleIcon className="text-red-500 w-7" />
