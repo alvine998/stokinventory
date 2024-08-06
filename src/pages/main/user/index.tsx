@@ -1,6 +1,7 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Modal, { useModal } from "@/components/Modal";
+import Radio from "@/components/Radio";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
 import { CONFIG } from "@/config";
 import axios from "axios";
@@ -11,6 +12,7 @@ import {
   SaveAllIcon,
   Trash2Icon,
   TrashIcon,
+  TriangleAlert,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -57,6 +59,11 @@ export default function User({ table, session }: any) {
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [info, setInfo] = useState<infoTypes>({
+    loading: false,
+    message: "",
+    error_message: "",
+  });
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -127,6 +134,7 @@ export default function User({ table, session }: any) {
 
   const onSubmit = async (e: any) => {
     e?.preventDefault();
+    setInfo({ ...info, loading: true });
     const formData = Object.fromEntries(new FormData(e.target));
     try {
       const payload = {
@@ -159,15 +167,22 @@ export default function User({ table, session }: any) {
         icon: "success",
         text: "Data Berhasil Disimpan",
       });
+      setInfo({ ...info, loading: false });
       setModal({ ...modal, open: false });
       router.push("");
-    } catch (error) {
+    } catch (error: any) {
+      setInfo({
+        ...info,
+        loading: false,
+        error_message: error?.response?.data?.error_message,
+      });
       console.log(error);
     }
   };
   const onRemove = async (e: any) => {
     try {
       e?.preventDefault();
+      setInfo({ ...info, loading: true });
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
         CONFIG.base_url_api + `/user?id=${formData?.id}`,
@@ -182,9 +197,15 @@ export default function User({ table, session }: any) {
         icon: "success",
         text: "Data Berhasil Dihapus",
       });
+      setInfo({ ...info, loading: false });
       setModal({ ...modal, open: false });
       router.push("");
-    } catch (error) {
+    } catch (error: any) {
+      setInfo({
+        ...info,
+        loading: false,
+        error_message: error?.response?.data?.error_message,
+      });
       console.log(error);
     }
   };
@@ -294,6 +315,7 @@ export default function User({ table, session }: any) {
                 <ReactSelect
                   id="role"
                   menuPlacement="top"
+                  name="role"
                   options={[
                     {
                       value: "super_admin",
@@ -311,6 +333,23 @@ export default function User({ table, session }: any) {
                   defaultValue={{ value: "super_admin", label: "Super Admin" }}
                 />
               </div>
+              <Radio
+                id="gender"
+                name="gender"
+                options={[
+                  {
+                    value: "L",
+                    name: "Laki-laki",
+                    checked: modal?.data?.gender == "L" || true
+                  },
+                  {
+                    value: "P",
+                    name: "Perempuan",
+                    checked: modal?.data?.gender == "P"
+                  },
+                ]}
+                label="Jenis Kelamin"
+              />
               {modal.key == "update" ? (
                 <div>
                   <div className="w-full my-2">
@@ -342,6 +381,13 @@ export default function User({ table, session }: any) {
               ) : (
                 ""
               )}
+              {
+                info.error_message ? 
+                <div className="p-2 w-full bg-red-200 rounded my-2 flex items-center gap-2">
+                  <TriangleAlert className="text-red-500" />
+                  <p className="text-red-500">{info.error_message}</p>
+                </div> : ""
+              }
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
                 <div>
                   <Button
@@ -358,10 +404,11 @@ export default function User({ table, session }: any) {
                 <div>
                   <Button
                     color="info"
+                    disabled={info.loading}
                     className={"flex gap-2 px-2 items-center justify-center"}
                   >
                     <SaveAllIcon className="w-4 h-4" />
-                    Simpan
+                    {info.loading ? "Menyimpan..." : "Simpan"}
                   </Button>
                 </div>
               </div>
@@ -399,10 +446,11 @@ export default function User({ table, session }: any) {
                 <div>
                   <Button
                     color="danger"
+                    disabled={info.loading}
                     className={"flex gap-2 px-2 items-center justify-center"}
                   >
                     <Trash2Icon className="w-4 h-4" />
-                    Hapus
+                    {info.loading ? "Menghapus..." : "Hapus"}
                   </Button>
                 </div>
               </div>
