@@ -14,6 +14,7 @@ import {
   BoxIcon,
   Building2Icon,
   ChevronDownCircle,
+  ClipboardCheckIcon,
   ClipboardListIcon,
   CogIcon,
   DoorOpenIcon,
@@ -57,7 +58,7 @@ export default function NavbarDesktop({
       href: `/main/product`,
       icon: <BoxIcon />,
     },
-    {
+    session?.role !== "admin_store" && {
       name: "Data Toko",
       href: `/main/store`,
       icon: <StoreIcon />,
@@ -82,7 +83,12 @@ export default function NavbarDesktop({
       href: `/main/expired`,
       icon: <TriangleAlertIcon />,
     },
-    {
+    session?.role == "super_admin" && {
+      name: "Daftar Resep",
+      href: `/main/recipe`,
+      icon: <ClipboardCheckIcon />,
+    },
+    session?.role == "super_admin" && {
       name: "Akses Admin",
       href: `/main/user`,
       icon: <Users2Icon />,
@@ -157,7 +163,9 @@ export default function NavbarDesktop({
                 className="w-30 h-30"
               />
             ) : (
-              <h2 className="text-blue-500 text-2xl text-center">StokInventory</h2>
+              <h2 className="text-blue-500 text-2xl text-center">
+                StokInventory
+              </h2>
             )}
           </div>
           <div className="flex flex-col mt-5">

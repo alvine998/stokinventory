@@ -13,6 +13,7 @@ import {
   BoxIcon,
   Building2Icon,
   ChevronDownCircle,
+  ClipboardCheckIcon,
   ClipboardListIcon,
   CogIcon,
   DoorOpenIcon,
@@ -55,7 +56,7 @@ export default function NavbarMobile({
       href: `/main/product`,
       icon: <BoxIcon />,
     },
-    {
+    session?.role !== "admin_store" && {
       name: "Data Toko",
       href: `/main/store`,
       icon: <StoreIcon />,
@@ -75,7 +76,12 @@ export default function NavbarMobile({
       href: `/main/expired`,
       icon: <TriangleAlertIcon />,
     },
-    {
+    session?.role == "super_admin" && {
+      name: "Daftar Resep",
+      href: `/main/recipe`,
+      icon: <ClipboardCheckIcon />,
+    },
+    session?.role == "super_admin" &&{
       name: "Akses Admin",
       href: `/main/user`,
       icon: <Users2Icon />,
