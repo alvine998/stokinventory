@@ -207,7 +207,7 @@ export default function Medicine({ table, session }: any) {
               type="search"
               placeholder="Cari disini..."
               defaultValue={filter?.search}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setFilter({ ...filter, search: e.target.value });
               }}
             />
@@ -304,13 +304,6 @@ export default function Medicine({ table, session }: any) {
                 name="code"
                 defaultValue={modal?.data?.code || ""}
                 required
-              />
-              <Input
-                label="Stok"
-                placeholder="Masukkan Stok"
-                name="stock"
-                defaultValue={modal?.data?.stock || ""}
-                type="number"
               />
               <Input
                 isCurrency

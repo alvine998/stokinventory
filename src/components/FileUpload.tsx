@@ -25,10 +25,10 @@ export default function FileUpload(props: Props) {
         }}
         className="border rounded w-full h-[200px] flex justify-center items-center"
       >
-        {image?.data !== "" ? (
+        {image ? (
           <div className="flex flex-col gap-2 justify-center items-center">
             <FolderCheckIcon className="w-10 h-10 text-green-500" />
-            <a href={image?.preview} target="_blank" >Lihat Hasil Upload</a>
+            <a href={image?.preview} target="_blank" className="font-semibold text-green-500" >Berhasil Upload</a>
           </div>
         ) : (
           <div className="flex flex-col gap-2 justify-center items-center">
