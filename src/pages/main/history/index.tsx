@@ -140,7 +140,7 @@ export default function Medicine({ table }: any) {
             <div className='mt-5'>
                 <div className='flex lg:flex-row flex-col justify-between items-center'>
                     <div className='lg:w-auto w-full'>
-                        <Input label='' type='search' placeholder='Cari disini...' defaultValue={filter?.search} onChange={(e) => {
+                        <Input label='' type='search' placeholder='Cari disini...' defaultValue={filter?.search} onChange={(e: any) => {
                             setFilter({ ...filter, search: e.target.value })
                         }} />
                     </div>

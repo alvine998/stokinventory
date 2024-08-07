@@ -227,7 +227,7 @@ export default function Medicine({ table, session }: any) {
               type="search"
               placeholder="Cari disini..."
               defaultValue={filter?.search}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setFilter({ ...filter, search: e.target.value });
               }}
             />
