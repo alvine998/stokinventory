@@ -27,6 +27,7 @@ import {
   StethoscopeIcon,
   StoreIcon,
   TriangleAlertIcon,
+  TruckIcon,
   UserCircle,
   UserCircle2Icon,
   UserIcon,
@@ -53,19 +54,24 @@ export default function NavbarDesktop({
       href: `/main/dashboard`,
       icon: <HomeIcon />,
     },
-    {
+    session?.role !== "admin_store" && {
       name: "Data Produk",
       href: `/main/product`,
       icon: <BoxIcon />,
+    },
+    session?.role !== "admin_store" && {
+      name: "Data Supplier",
+      href: `/main/supplier`,
+      icon: <TruckIcon />,
     },
     session?.role !== "admin_store" && {
       name: "Data Toko",
       href: `/main/store`,
       icon: <StoreIcon />,
     },
-    {
+    session?.role !== "admin_store" && {
       name: "Stock",
-      href: `/main/so`,
+      href: `/main/so/in`,
       icon: <ArrowLeftRightIcon />,
     },
     {
@@ -73,12 +79,12 @@ export default function NavbarDesktop({
       href: `/main/po`,
       icon: <ClipboardListIcon />,
     },
-    {
+    session?.role !== "admin_store" && {
       name: "Delivery",
       href: `/main/do`,
       icon: <ArchiveRestoreIcon />,
     },
-    {
+    session?.role !== "admin_store" && {
       name: "Produk Kadaluwarsa",
       href: `/main/expired`,
       icon: <TriangleAlertIcon />,

@@ -26,6 +26,7 @@ import {
   StethoscopeIcon,
   StoreIcon,
   TriangleAlertIcon,
+  TruckIcon,
   UserCircle,
   UserCircle2Icon,
   UserIcon,
@@ -57,9 +58,19 @@ export default function NavbarMobile({
       icon: <BoxIcon />,
     },
     session?.role !== "admin_store" && {
+      name: "Data Supplier",
+      href: `/main/supplier`,
+      icon: <TruckIcon />,
+    },
+    session?.role !== "admin_store" && {
       name: "Data Toko",
       href: `/main/store`,
       icon: <StoreIcon />,
+    },
+    session?.role !== "admin_store" && {
+      name: "Stock",
+      href: `/main/so/in`,
+      icon: <ArrowLeftRightIcon />,
     },
     {
       name: "Order",
