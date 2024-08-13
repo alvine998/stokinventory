@@ -30,7 +30,9 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/users?page=${+page || 1}&size=${+size || 10}&search=${search || ""}`,
+        `/users?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -38,9 +40,16 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
+    const stores = await axios.get(CONFIG.base_url_api + `/stores`, {
+      headers: {
+        "bearer-token": "stokinventoryapi",
+        "x-partner-code": session?.partner_code,
+      },
+    });
     return {
       props: {
         table: result?.data || [],
+        stores: stores?.data?.items || [],
         session,
       },
     };
@@ -54,11 +63,12 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function User({ table, session }: any) {
+export default function User({ table, session, stores }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [role, setRole] = useState<any>("super_admin");
   const [info, setInfo] = useState<infoTypes>({
     loading: false,
     message: "",
@@ -73,6 +83,13 @@ export default function User({ table, session }: any) {
     const queryFilter = new URLSearchParams(filter).toString();
     router.push(`?${queryFilter}`);
   }, [filter]);
+  const STORES = [{value:"", label:"Pilih Toko"},
+    ...stores?.map((v: any) => ({
+      ...v,
+      value: v?.id,
+      label: v?.name,
+    })),
+  ];
   const CustomerColumn: any = [
     {
       name: "Nama",
@@ -88,6 +105,11 @@ export default function User({ table, session }: any) {
       name: "No Telepon",
       sortable: true,
       selector: (row: any) => row?.phone || "-",
+    },
+    {
+      name: "Toko",
+      sortable: true,
+      selector: (row: any) => row?.store_name || "-",
     },
     {
       name: "Peran",
@@ -114,6 +136,7 @@ export default function User({ table, session }: any) {
             color="primary"
             onClick={() => {
               setModal({ ...modal, open: true, data: row, key: "update" });
+              setRole(row?.role);
             }}
           >
             <PencilIcon className="text-white w-5 h-5" />
@@ -136,9 +159,16 @@ export default function User({ table, session }: any) {
     e?.preventDefault();
     setInfo({ ...info, loading: true });
     const formData = Object.fromEntries(new FormData(e.target));
+    let store = null;
+    if(formData?.store){
+      store = STORES?.find((v:any) => v?.id == formData?.store)
+    }
     try {
       const payload = {
         ...formData,
+        store_id: store?.id,
+        store_name: store?.name,
+        store_code: store?.code
       };
       if (formData?.id) {
         const result = await axios.patch(
@@ -168,10 +198,11 @@ export default function User({ table, session }: any) {
         text: "Data Berhasil Disimpan",
       });
       setInfo({ ...info, loading: false });
+      setRole("super_admin");
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error: any) {
-      let errors = error?.response?.data
+      let errors = error?.response?.data;
       setInfo({
         ...info,
         loading: false,
@@ -202,7 +233,7 @@ export default function User({ table, session }: any) {
       setModal({ ...modal, open: false });
       router.push("");
     } catch (error: any) {
-      let errors = error?.response?.data
+      let errors = error?.response?.data;
       setInfo({
         ...info,
         loading: false,
@@ -224,7 +255,7 @@ export default function User({ table, session }: any) {
       value: "admin_store",
       label: "Admin Toko",
     },
-  ]
+  ];
   return (
     <div>
       <h2 className="text-2xl font-semibold">Akses Admin</h2>
@@ -324,6 +355,23 @@ export default function User({ table, session }: any) {
                 defaultValue={""}
                 required={modal.key == "create"}
               />
+              <Radio
+                id="gender"
+                name="gender"
+                options={[
+                  {
+                    value: "L",
+                    name: "Laki-laki",
+                    checked: modal?.data?.gender == "L" || true,
+                  },
+                  {
+                    value: "P",
+                    name: "Perempuan",
+                    checked: modal?.data?.gender == "P",
+                  },
+                ]}
+                label="Jenis Kelamin"
+              />
               <div>
                 <label htmlFor="role" className="text-gray-500">
                   Peran
@@ -332,27 +380,42 @@ export default function User({ table, session }: any) {
                   id="role"
                   menuPlacement="top"
                   name="role"
+                  onChange={(e: any) => {
+                    setRole(e.value);
+                  }}
                   options={roles}
-                  defaultValue={roles?.find((v:any) => v.value == modal?.data?.role) || roles[0]}
+                  defaultValue={
+                    roles?.find((v: any) => v.value == modal?.data?.role) ||
+                    roles[0]
+                  }
                 />
               </div>
-              <Radio
-                id="gender"
-                name="gender"
-                options={[
-                  {
-                    value: "L",
-                    name: "Laki-laki",
-                    checked: modal?.data?.gender == "L" || true
-                  },
-                  {
-                    value: "P",
-                    name: "Perempuan",
-                    checked: modal?.data?.gender == "P"
-                  },
-                ]}
-                label="Jenis Kelamin"
-              />
+              {role == "admin_store" ? (
+                <div className="mt-2">
+                  <label htmlFor="store" className="text-gray-500">
+                    Toko
+                  </label>
+                  <ReactSelect
+                    id="store"
+                    menuPlacement="top"
+                    name="store"
+                    required
+                    options={STORES}
+                    defaultValue={{
+                      value:
+                        STORES?.find(
+                          (v: any) => v.value == modal?.data?.store_id
+                        )?.id || "",
+                      label:
+                        STORES?.find(
+                          (v: any) => v.value == modal?.data?.store_id
+                        )?.name || "Pilih Toko",
+                    }}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
               {modal.key == "update" ? (
                 <div>
                   <div className="w-full my-2">
@@ -384,20 +447,22 @@ export default function User({ table, session }: any) {
               ) : (
                 ""
               )}
-              {
-                info.error_message ? 
+              {info.error_message ? (
                 <div className="p-2 w-full bg-red-200 rounded my-2 flex items-center gap-3">
                   <TriangleAlert className="text-red-500" />
                   <p className="text-red-500">{info.error_message}</p>
-                </div> : ""
-              }
-              <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
+                </div>
+              ) : (
+                ""
+              )}
+              <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end mt-4">
                 <div>
                   <Button
                     color="white"
                     type="button"
                     onClick={() => {
                       setModal({ open: false });
+                      setRole("super_admin");
                     }}
                   >
                     Kembali
@@ -433,13 +498,14 @@ export default function User({ table, session }: any) {
               <p className="text-center my-2">
                 Apakah anda yakin ingin menghapus data {modal?.data?.name}?
               </p>
-              {
-                info.error_message && modal.key == "delete" ? 
+              {info.error_message && modal.key == "delete" ? (
                 <div className="p-2 w-full bg-red-200 rounded my-2 flex items-center gap-3">
                   <TriangleAlert className="text-red-500" />
                   <p className="text-red-500">{info.error_message}</p>
-                </div> : ""
-              }
+                </div>
+              ) : (
+                ""
+              )}
               <div className="flex gap-2 lg:flex-row flex-col-reverse justify-end">
                 <div>
                   <Button
