@@ -13,14 +13,22 @@ import DataTable from "react-data-table-component";
 export async function getServerSideProps(context: any) {
   try {
     const { page, size, search } = context.query;
-    const { req, res } = context;
+    const { req, res, params } = context;
     let session: any = getCookie("session", { req, res });
     if (session) {
       session = JSON.parse(session);
     }
-    const result = await axios.get(
+    let stock: any = await axios.get(CONFIG.base_url_api + `/stocks?type=in`, {
+      headers: {
+        "bearer-token": "stokinventoryapi",
+        "x-partner-code": session?.partner_code,
+      },
+    });
+    const product = await axios.get(
       CONFIG.base_url_api +
-        `/stocks?page=${+page || 1}&size=${+size || 10}&search=${search || ""}`,
+        `/products?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -28,22 +36,40 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
-    const products = await axios.get(
-      CONFIG.base_url_api +
-        `/products?page=${+page || 1}&size=${+size || 10}&search=${
-          search || ""
-        }`,
-      {
-        headers: {
-          "bearer-token": "stokinventoryapi",
-          "x-partner-code": session?.partner_code,
-        },
+    let qty = [];
+    stock = stock?.data?.items;
+    for (let index = 0; index < stock.length; index++) {
+      const element = stock[index];
+      qty.push(...JSON.parse(element?.products));
+    }
+    console.log(qty);
+    qty = qty?.reduce((a: any, b: any) => {
+      const exist = a?.find((v: any) => v?.id == b?.id);
+      if (exist) {
+        // Check if the existing item's expiration date is still valid
+        const expired_date = moment(exist.expired_at);
+        if (moment().isBefore(expired_date)) {
+          // If the item is not expired, add the quantity
+          exist.stock += b.qty;
+        } else {
+          // If the item is expired, treat it as a new entry
+          a.push({
+            id: b.id,
+            name: b.name,
+            code: b.code,
+            stock: b.qty,
+            expired_at: b.expired_at,
+          });
+        }
+      } else {
+        a.push({ id: b.id, name: b.name, code: b.code, stock: 0 });
       }
-    );
+      return a;
+    }, []);
     return {
       props: {
-        table: result?.data || [],
-        products: products.data?.items || [],
+        table: product?.data || [],
+        stock: qty || [],
         session,
       },
     };
@@ -57,7 +83,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session, products }: any) {
+export default function Medicine({ table, session, stock }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
@@ -73,24 +99,21 @@ export default function Medicine({ table, session, products }: any) {
   }, [filter]);
   const Column: any = [
     {
-      name: "Waktu",
+      name: "Nama Produk",
       sortable: true,
-      selector: (row: any) => row?.date,
+      selector: (row: any) => row?.name,
     },
     {
-      name: "Jenis Stok",
+      name: "Kode Produk",
+      sortable: true,
+      selector: (row: any) => row?.code,
+    },
+    {
+      name: "Stok Kadaluwarsa",
       sortable: true,
       selector: (row: any) =>
-        row?.type == "in" ? "Barang Masuk" : "Barang Keluar",
-    },
-    {
-      name: "Bukti",
-      sortable: true,
-      selector: (row: any) => (
-        <a href={row?.image} className="text-blue-500">
-          Lihat
-        </a>
-      ),
+        (stock?.find((v: any) => row?.id == v?.id)?.stock || 0) +
+        ` ${row?.unit}`,
     },
   ];
 

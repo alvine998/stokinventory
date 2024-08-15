@@ -47,6 +47,7 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
+    console.log(result?.data?.items[0]);
     const products = await axios.get(
       CONFIG.base_url_api +
         `/products?page=${+page || 1}&size=${+size || 100}&search=${
@@ -156,8 +157,8 @@ export default function Stock({
             setModal({
               ...modal,
               open: true,
-              data: row?.products,
-              key: "product",
+              data: row,
+              key: "view",
             });
           }}
         >
@@ -602,7 +603,7 @@ export default function Stock({
               </div>
               <div className="flex gap-2 justify-between">
                 <div className="bg-slate-100 rounded p-2 w-full">
-                  {JSON.parse(modal?.data?.products)?.map(
+                  {JSON.parse(modal?.data?.products)?.length > 0 && JSON.parse(modal?.data?.products)?.map(
                     (v: any, i: number) => (
                       <p
                         key={i}
