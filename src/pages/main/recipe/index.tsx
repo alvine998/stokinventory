@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Modal, { useModal } from "@/components/Modal";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
+import TextArea from "@/components/TextArea";
 import { CONFIG } from "@/config";
 import { toMoney } from "@/utils";
 import axios from "axios";
@@ -13,10 +14,13 @@ import {
   SaveAllIcon,
   Trash2Icon,
   TrashIcon,
+  XCircleIcon,
 } from "lucide-react";
+import moment from "moment";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
+import ReactSelect from "react-select";
 import Swal from "sweetalert2";
 
 export async function getServerSideProps(context: any) {
@@ -29,9 +33,9 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/products?page=${+page || 1}&size=${+size || 10}&search=${
-          search || ""
-        }`,
+        `/recipes?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -39,9 +43,16 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
+    const products = await axios.get(CONFIG.base_url_api + `/products`, {
+      headers: {
+        "bearer-token": "stokinventoryapi",
+        "x-partner-code": session?.partner_code,
+      },
+    });
     return {
       props: {
         table: result?.data || [],
+        products: products.data?.items || [],
         session,
       },
     };
@@ -55,11 +66,13 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session }: any) {
+export default function Medicine({ table, session, products }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [list, setList] = useState<any>({ product: [] });
+  const [product, setProduct] = useState<any>(products);
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -119,6 +132,13 @@ export default function Medicine({ table, session }: any) {
             title="Edit"
             color="primary"
             onClick={() => {
+              setList({ product: JSON.parse(row?.products) });
+              setProduct(
+                product?.filter(
+                  (val: any) =>
+                    !list?.product?.map((v: any) => v?.id)?.includes(val?.id)
+                )
+              );
               setModal({ ...modal, open: true, data: row, key: "update" });
             }}
           >
@@ -136,7 +156,7 @@ export default function Medicine({ table, session }: any) {
         </div>
       ),
     },
-  ]?.filter((v:any) => v !== false);
+  ]?.filter((v: any) => v !== false);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -148,10 +168,11 @@ export default function Medicine({ table, session }: any) {
       const payload = {
         ...formData,
         price: formData?.price?.replaceAll(".", ""),
+        products: list?.product,
       };
       if (formData?.id) {
         const result = await axios.patch(
-          CONFIG.base_url_api + `/product`,
+          CONFIG.base_url_api + `/recipe`,
           payload,
           {
             headers: {
@@ -162,7 +183,7 @@ export default function Medicine({ table, session }: any) {
         );
       } else {
         const result = await axios.post(
-          CONFIG.base_url_api + `/product`,
+          CONFIG.base_url_api + `/recipe`,
           payload,
           {
             headers: {
@@ -190,7 +211,7 @@ export default function Medicine({ table, session }: any) {
       setLoading(true);
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
-        CONFIG.base_url_api + `/product?id=${formData?.id}`,
+        CONFIG.base_url_api + `/recipe?id=${formData?.id}`,
         {
           headers: {
             "bearer-token": "stokinventoryapi",
@@ -314,20 +335,6 @@ export default function Medicine({ table, session }: any) {
                 required
               />
               <Input
-                label="Kode"
-                placeholder="Masukkan Kode"
-                name="code"
-                defaultValue={modal?.data?.code || ""}
-                required
-              />
-              <Input
-                label="Stok"
-                placeholder="Masukkan Stok"
-                name="stock"
-                defaultValue={modal?.data?.stock || ""}
-                type="number"
-              />
-              <Input
                 isCurrency
                 label="Harga Modal"
                 placeholder="Masukkan Harga Modal"
@@ -335,20 +342,93 @@ export default function Medicine({ table, session }: any) {
                 defaultValue={modal?.data?.price || ""}
                 required
               />
-              <Input
-                label="Min Order"
-                placeholder="Masukkan Min Order"
-                name="moq"
-                defaultValue={modal?.data?.moq || ""}
-                type="number"
+              <TextArea
+                label="Keterangan"
+                isOptional
+                name="remarks"
+                defaultValue={modal?.data?.remarks || ""}
+                placeholder="Masukkan keterangan"
               />
-              <Input
-                label="Satuan"
-                placeholder="Kg/Pcs/Ons/dll"
-                name="unit"
-                defaultValue={modal?.data?.unit || ""}
-                required
-              />
+
+              {/* Product */}
+              <div className="mt-2">
+                <label htmlFor="products" className="text-gray-500">
+                  Produk
+                </label>
+                <ReactSelect
+                  id="products"
+                  menuPlacement="top"
+                  options={product?.map((v: any) => ({
+                    ...v,
+                    value: v.id,
+                    label: v.name,
+                  }))}
+                  placeholder="Pilih Produk"
+                  onChange={(e: any) => {
+                    setList({
+                      product:
+                        list?.product?.length > 0 ? [...list?.product, e] : [e],
+                    });
+                    setProduct(
+                      product?.filter((val: any) => val?.id !== e?.value)
+                    );
+                  }}
+                />
+              </div>
+              {list?.product &&
+                list?.product?.map((v: any, i: number) => (
+                  <div
+                    key={i}
+                    className="mt-2 flex justify-between items-center gap-2"
+                  >
+                    <Input
+                      value={v.label}
+                      label={i == 0 ? "Nama Produk" : ""}
+                      disabled
+                    />
+                    <Input
+                      defaultValue={v.measure}
+                      isCurrency
+                      label={i == 0 ? "Takaran" : ""}
+                      placeholder="Masukkan Takaran"
+                      onValueChange={(values: any) => {
+                        const newstate = list?.product?.map(
+                          (val: any, idx: number) => {
+                            if (i == idx) {
+                              val.measure = values.floatValue;
+                            }
+                            return val;
+                          }
+                        );
+                        setList({ product: newstate });
+                      }}
+                    />
+                    <div className="w-full">
+                      <Input
+                        disabled
+                        value={"gram"}
+                        label={i == 0 ? "Satuan" : ""}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className={i == 0 ? "pt-5" : ""}
+                      onClick={() => {
+                        setList({
+                          product: list?.product?.filter(
+                            (val: any) => val?.id !== v?.id
+                          ),
+                        });
+                        setProduct([
+                          ...product,
+                          products?.find((val: any) => val?.id == v?.id),
+                        ]);
+                      }}
+                    >
+                      <XCircleIcon className="text-red-500 w-7" />
+                    </button>
+                  </div>
+                ))}
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
                 <div>
                   <Button
@@ -416,6 +496,54 @@ export default function Medicine({ table, session }: any) {
                 </div>
               </div>
             </form>
+          </Modal>
+        ) : (
+          ""
+        )}
+        {modal?.key == "view" ? (
+          <Modal
+            open={modal.open}
+            setOpen={() => setModal({ ...modal, open: false })}
+          >
+            <h2 className="text-xl font-semibold text-center">Bahan-bahan</h2>
+            <div className="flex gap-2 justify-between mt-4">
+              <div className="bg-green-200 rounded p-2 w-full">
+                <h5 className="font-bold text-lg text-center">Produk</h5>
+              </div>
+              <div className="bg-green-200 rounded p-2 w-full">
+                <h5 className="font-bold text-lg text-center">Takaran</h5>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-between">
+              <div className="bg-slate-100 rounded p-2 w-full">
+                {JSON.parse(modal?.data?.products)?.map((v: any, i: number) => (
+                  <p key={i} className="font-semibold text-center">
+                    {v?.name}
+                  </p>
+                ))}
+              </div>
+              <div className="bg-slate-100 rounded p-2 w-full">
+                {JSON.parse(modal?.data?.products)?.map((v: any, i: number) => (
+                  <p className="text-center font-semibold" key={i}>
+                    {v?.measure} gr
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2 lg:flex-row flex-col-reverse justify-end">
+              <div>
+                <Button
+                  color="white"
+                  type="button"
+                  onClick={() => {
+                    setModal({ open: false });
+                  }}
+                >
+                  Kembali
+                </Button>
+              </div>
+            </div>
           </Modal>
         ) : (
           ""

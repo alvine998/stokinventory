@@ -30,7 +30,21 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/stores?page=${+page || 1}&size=${+size || 10}&search=${search || ""}`,
+        `/deliveries?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
+    );
+    const stocks = await axios.get(
+      CONFIG.base_url_api +
+        `/stocks?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}&type=out&status=1`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -41,6 +55,7 @@ export async function getServerSideProps(context: any) {
     return {
       props: {
         table: result?.data || [],
+        stocks: stocks?.data || [],
         session,
       },
     };
@@ -54,7 +69,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session }: any) {
+export default function Medicine({ table, session, stocks }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
@@ -107,12 +122,24 @@ export default function Medicine({ table, session }: any) {
     {
       name: "Bukti",
       sortable: true,
-      selector: (row: any) => row?.image ? <Image alt="bukti" src={row?.image} width={50} height={50} />  : "-",
+      selector: (row: any) =>
+        row?.image ? (
+          <Image alt="bukti" src={row?.image} width={50} height={50} />
+        ) : (
+          "-"
+        ),
     },
     {
       name: "Status",
       sortable: true,
-      selector: (row: any) => row?.status == 0 ? "Menunggu" : row?.status == 1 ? "Dalam Perjalanan" : row?.status == 2 ? "Sampai Tujuan" : "Pending",
+      selector: (row: any) =>
+        row?.status == 0
+          ? "Menunggu"
+          : row?.status == 1
+          ? "Dalam Perjalanan"
+          : row?.status == 2
+          ? "Sampai Tujuan"
+          : "Pending",
     },
     {
       name: "Aksi",
@@ -140,6 +167,22 @@ export default function Medicine({ table, session }: any) {
         </div>
       ),
     },
+  ];
+
+  const StockColumn: any = [
+    {
+      name: "Produk",
+      sortable: true,
+      selector: (row: any) =>
+        row?.products?.map(
+          (v: any, i: number) => `${i + 1}. ${v?.name}${(<br />)}`
+        ),
+    },
+    {
+      name: "Toko Tujuan",
+      sortable: true,
+      selector: (row: any) => row?.store_name || "-",
+    }
   ];
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -286,7 +329,30 @@ export default function Medicine({ table, session }: any) {
                   value={modal?.data?.id || null}
                 />
               )}
-              <Input
+              {show && (
+                <DataTable
+                  pagination
+                  onChangePage={(pageData) => {
+                    setFilter({ ...filter, page: pageData });
+                  }}
+                  onChangeRowsPerPage={(currentRow, currentPage) => {
+                    setFilter({
+                      ...filter,
+                      page: currentPage,
+                      size: currentRow,
+                    });
+                  }}
+                  responsive={true}
+                  paginationTotalRows={stocks?.total_items}
+                  paginationDefaultPage={1}
+                  paginationServer={true}
+                  striped
+                  columns={StockColumn}
+                  data={stocks?.items}
+                  customStyles={CustomTableStyle}
+                />
+              )}
+              {/* <Input
                 label="Nama Toko"
                 placeholder="Masukkan Nama Toko"
                 name="name"
@@ -320,7 +386,7 @@ export default function Medicine({ table, session }: any) {
                 name="long"
                 defaultValue={modal?.data?.long || ""}
                 isOptional
-              />
+              /> */}
 
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
                 <div>

@@ -102,7 +102,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({
+export default function Stock({
   table,
   session,
   products,
@@ -374,7 +374,7 @@ export default function Medicine({
                     value={modal?.data?.id || null}
                   />
                 )}
-                <Radio
+                {/* <Radio
                   id="radio1"
                   name="type"
                   options={[
@@ -392,7 +392,7 @@ export default function Medicine({
                     },
                   ]}
                   label="Jenis Stok"
-                />
+                /> */}
                 {type == "out" ? (
                   <div className="mt-2">
                     <label htmlFor="store" className="text-gray-500">
@@ -413,26 +413,7 @@ export default function Medicine({
                 ) : (
                   ""
                 )}
-                {type == "in" ? (
-                  <div className="mt-2">
-                    <label htmlFor="supplier" className="text-gray-500">
-                      Supplier
-                    </label>
-                    <ReactSelect
-                      id="supplier"
-                      options={suppliers?.map((v: any) => ({
-                        ...v,
-                        value: v.id,
-                        label: v.name,
-                      }))}
-                      required
-                      placeholder="Pilih Toko Supplier"
-                      name="supplier"
-                    />
-                  </div>
-                ) : (
-                  ""
-                )}
+
                 <div className="mt-2">
                   <label htmlFor="products" className="text-gray-500">
                     Produk
@@ -466,15 +447,15 @@ export default function Medicine({
                       disabled
                     />
                     <Input
-                      value={v.stock}
+                      value={v.qty}
                       isCurrency
                       label={i == 0 ? "Jumlah Produk" : ""}
                       placeholder="Masukkan Jumlah Produk"
-                      onChange={(e: any) => {
+                      onValueChange={(values: any) => {
                         const newstate = list?.product?.map(
                           (val: any, idx: number) => {
                             if (i == idx) {
-                              val.qty = +e.target.value;
+                              val.qty = values.floatValue
                             }
                             return val;
                           }

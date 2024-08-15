@@ -5,6 +5,7 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
+import { deleteCookie } from "cookies-next";
 import {
   ArchiveRestoreIcon,
   ArrowLeftRightIcon,
@@ -17,6 +18,7 @@ import {
   ClipboardListIcon,
   CogIcon,
   DoorOpenIcon,
+  HandshakeIcon,
   HomeIcon,
   MenuIcon,
   NewspaperIcon,
@@ -92,7 +94,7 @@ export default function NavbarMobile({
       href: `/main/recipe`,
       icon: <ClipboardCheckIcon />,
     },
-    session?.role == "super_admin" &&{
+    session?.role == "super_admin" && {
       name: "Akses Admin",
       href: `/main/user`,
       icon: <Users2Icon />,
@@ -104,9 +106,9 @@ export default function NavbarMobile({
     //   },
     session?.email?.includes("stokinventory.com") &&
       session?.is_stokinv_admin == 1 && {
-        name: "Akses Admin",
-        href: `/main/user`,
-        icon: <Users2Icon />,
+        name: "Partner",
+        href: `/main/partner`,
+        icon: <HandshakeIcon />,
       },
   ]?.filter((v: any) => v !== false);
   return (
@@ -164,6 +166,21 @@ export default function NavbarMobile({
                   </button>
                 </MenuItem>
               ))}
+              <MenuItem>
+                <button
+                  type="button"
+                  className={
+                    "group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 hover:bg-blue-200 text-red-500"
+                  }
+                  onClick={() => {
+                    deleteCookie("session");
+                    router.push("/");
+                  }}
+                >
+                  <DoorOpenIcon />
+                  Logout
+                </button>
+              </MenuItem>
             </MenuItems>
           </Transition>
         </Menu>
