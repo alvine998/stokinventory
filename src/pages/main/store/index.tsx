@@ -8,6 +8,7 @@ import axios from "axios";
 import { getCookie } from "cookies-next";
 import {
   ClipboardList,
+  EyeIcon,
   PencilIcon,
   PlusIcon,
   SaveAllIcon,
@@ -98,6 +99,15 @@ export default function Medicine({ table, session }: any) {
       right: true,
       selector: (row: any) => (
         <div className="flex gap-2">
+           <Button
+            title="Detail"
+            color="warning"
+            onClick={() => {
+              router.push(`/main/store/${row?.id}/detail`)
+            }}
+          >
+            <EyeIcon className="text-white w-5 h-5" />
+          </Button>
           <Button
             title="Edit"
             color="primary"
