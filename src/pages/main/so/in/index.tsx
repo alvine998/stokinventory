@@ -114,6 +114,7 @@ export default function Medicine({
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
   const [list, setList] = useState<any>({ product: [] });
+  const [selected, setSelected] = useState<any>();
   const [product, setProduct] = useState<any>(products);
   const [image, setImage] = useState<any>();
   const [progress, setProgress] = useState<any>();
@@ -141,8 +142,7 @@ export default function Medicine({
     {
       name: "Supplier",
       sortable: true,
-      selector: (row: any) =>
-        row?.supplier_name || "-",
+      selector: (row: any) => row?.supplier_name || "-",
     },
     {
       name: "Produk",
@@ -155,8 +155,8 @@ export default function Medicine({
             setModal({
               ...modal,
               open: true,
-              data: row?.products,
-              key: "product",
+              data: row,
+              key: "view",
             });
           }}
         >
@@ -235,22 +235,10 @@ export default function Medicine({
     setInfo({ ...info, loading: true });
     const formData = Object.fromEntries(new FormData(e.target));
     try {
-      let store = null;
-      let supplier = null;
-      if (formData?.store) {
-        store = stores?.find((v: any) => v?.id === formData?.store);
-      }
-      if (formData?.supplier) {
-        supplier = suppliers?.find((v: any) => v?.id === formData?.supplier);
-      }
       const payload = {
         ...formData,
-        supplier_id: supplier?.id || null,
-        supplier_name: supplier?.name || null,
-        store_id: store?.id || null,
-        store_name: store?.name || null,
-        store_code: store?.code || null,
         image: image,
+        supplier_id: +formData?.supplier_id,
         products: list?.product,
         qty: list?.product?.reduce((a: any, b: any) => a + +b.qty, 0),
         logs: { id: session?.id, name: session?.name },
@@ -267,6 +255,7 @@ export default function Medicine({
         icon: "success",
         text: "Data Berhasil Disimpan",
       });
+      setImage(null);
       setInfo({ ...info, loading: false });
       setModal({ ...modal, open: false });
       router.push("");
@@ -284,9 +273,10 @@ export default function Medicine({
     try {
       e?.preventDefault();
       setInfo({ ...info, loading: true });
-      const formData = Object.fromEntries(new FormData(e.target));
-      const result = await axios.delete(
-        CONFIG.base_url_api + `/stock?id=${formData?.id}`,
+      const formData: any = Object.fromEntries(new FormData(e.target));
+      const result = await axios.patch(
+        CONFIG.base_url_api + `/stock`,
+        { ...formData, products: JSON.parse(formData?.products) },
         {
           headers: {
             "bearer-token": "stokinventoryapi",
@@ -335,6 +325,8 @@ export default function Medicine({
                   "flex gap-2 px-2 items-center lg:justify-start justify-center"
                 }
                 onClick={() => {
+                  setList({ product: [] });
+                  setProduct(products)
                   setModal({ ...modal, open: true, data: null, key: "create" });
                 }}
               >
@@ -380,65 +372,32 @@ export default function Medicine({
                     value={modal?.data?.id || null}
                   />
                 )}
-                <Radio
-                  id="radio1"
-                  name="type"
-                  options={[
-                    {
-                      name: "Barang Masuk",
-                      value: "in",
-                      checked: modal?.data?.type == "in" || true,
-                      onChange: () => setType("in"),
-                    },
-                    {
-                      name: "Barang Keluar",
-                      value: "out",
-                      checked: modal?.data?.type == "out",
-                      onChange: () => setType("out"),
-                    },
-                  ]}
-                  label="Jenis Stok"
+                <input type="hidden" name="type" value={"in"} />
+                <div className="mt-2">
+                  <label htmlFor="supplier" className="text-gray-500">
+                    Supplier
+                  </label>
+                  <ReactSelect
+                    id="supplier"
+                    options={suppliers?.map((v: any) => ({
+                      ...v,
+                      value: v.id,
+                      label: v.name,
+                    }))}
+                    onChange={(e) => {
+                      setSelected(e);
+                    }}
+                    required
+                    placeholder="Pilih Toko Supplier"
+                    name="supplier"
+                  />
+                </div>
+                <input type="hidden" name="supplier_id" value={selected?.id} />
+                <input
+                  type="hidden"
+                  name="supplier_name"
+                  value={selected?.name}
                 />
-                {type == "out" ? (
-                  <div className="mt-2">
-                    <label htmlFor="store" className="text-gray-500">
-                      Toko Tujuan
-                    </label>
-                    <ReactSelect
-                      id="store"
-                      options={stores?.map((v: any) => ({
-                        ...v,
-                        value: v.id,
-                        label: v.name,
-                      }))}
-                      required
-                      placeholder="Pilih Toko Tujuan"
-                      name="store"
-                    />
-                  </div>
-                ) : (
-                  ""
-                )}
-                {type == "in" ? (
-                  <div className="mt-2">
-                    <label htmlFor="supplier" className="text-gray-500">
-                      Supplier
-                    </label>
-                    <ReactSelect
-                      id="supplier"
-                      options={suppliers?.map((v: any) => ({
-                        ...v,
-                        value: v.id,
-                        label: v.name,
-                      }))}
-                      required
-                      placeholder="Pilih Toko Supplier"
-                      name="supplier"
-                    />
-                  </div>
-                ) : (
-                  ""
-                )}
                 <div className="mt-2">
                   <label htmlFor="products" className="text-gray-500">
                     Produk
@@ -585,6 +544,11 @@ export default function Medicine({
               </h2>
               <form onSubmit={onRemove}>
                 <input type="hidden" name="id" value={modal?.data?.id} />
+                <input
+                  type="hidden"
+                  name="products"
+                  value={modal?.data?.products}
+                />
                 <p className="text-center my-2">
                   Apakah anda yakin ingin menghapus data ini?
                 </p>
@@ -613,6 +577,71 @@ export default function Medicine({
                   </div>
                 </div>
               </form>
+            </Modal>
+          ) : (
+            ""
+          )}
+
+          {modal?.key == "view" ? (
+            <Modal
+              open={modal.open}
+              setOpen={() => setModal({ ...modal, open: false })}
+            >
+              <h2 className="text-xl font-bold text-center">Produk Barang Masuk</h2>
+              <div className="flex gap-2 justify-between mt-4">
+                <div className="bg-green-200 rounded p-2 w-full">
+                  <h5 className="font-bold text-lg text-center">Nama Produk</h5>
+                </div>
+                <div className="bg-green-200 rounded p-2 w-full">
+                  <h5 className="font-bold text-lg text-center">
+                    Jumlah Produk
+                  </h5>
+                </div>
+              </div>
+              <div className="flex gap-2 justify-between">
+                <div className="bg-slate-100 rounded p-2 w-full">
+                  {JSON.parse(modal?.data?.products)?.map(
+                    (v: any, i: number) => (
+                      <p
+                        key={i}
+                        className={`${
+                          i !== 0 ? "mt-2" : ""
+                        } font-semibold text-center border-b-2 border-b-gray-800`}
+                      >
+                        {v?.name?.toUpperCase()}
+                      </p>
+                    )
+                  )}
+                </div>
+                <div className="bg-slate-100 rounded p-2 w-full">
+                  {JSON.parse(modal?.data?.products)?.map(
+                    (v: any, i: number) => (
+                      <p
+                        className={`${
+                          i !== 0 ? "mt-2" : ""
+                        } text-center font-semibold border-b-2 border-b-gray-800`}
+                        key={i}
+                      >
+                        {v?.qty} {v?.unit}
+                      </p>
+                    )
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-2 lg:flex-row flex-col-reverse justify-end">
+                <div>
+                  <Button
+                    color="white"
+                    type="button"
+                    onClick={() => {
+                      setModal({ open: false });
+                    }}
+                  >
+                    Kembali
+                  </Button>
+                </div>
+              </div>
             </Modal>
           ) : (
             ""
