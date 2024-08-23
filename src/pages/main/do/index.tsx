@@ -14,10 +14,12 @@ import {
   Trash2Icon,
   TrashIcon,
 } from "lucide-react";
+import moment from "moment";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
+import ReactSelect from "react-select";
 import Swal from "sweetalert2";
 
 export async function getServerSideProps(context: any) {
@@ -52,10 +54,20 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
+    const couriers = await axios.get(
+      CONFIG.base_url_api + `/users?role=courier`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
+    );
     return {
       props: {
         table: result?.data || [],
         stocks: stocks?.data || [],
+        couriers: couriers?.data?.items || [],
         session,
       },
     };
@@ -69,11 +81,12 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session, stocks }: any) {
+export default function Medicine({ table, session, stocks, couriers }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [selectableData, setSelectableData] = useState<any>();
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -95,7 +108,7 @@ export default function Medicine({ table, session, stocks }: any) {
               ...modal,
               open: true,
               key: "view",
-              data: row?.stocks,
+              data: row,
             });
           }}
           className="text-blue-500"
@@ -117,14 +130,24 @@ export default function Medicine({ table, session, stocks }: any) {
     {
       name: "Diantar Oleh",
       sortable: true,
-      selector: (row: any) => row?.delivered_by?.name || "-",
+      selector: (row: any) => JSON.parse(row?.delivered_by)?.name || "-",
     },
     {
-      name: "Bukti",
+      name: "Barang Antar",
       sortable: true,
       selector: (row: any) =>
-        row?.image ? (
-          <Image alt="bukti" src={row?.image} width={50} height={50} />
+        row?.image_deliver ? (
+          <Image alt="bukti" src={row?.image_deliver} width={50} height={50} />
+        ) : (
+          "-"
+        ),
+    },
+    {
+      name: "Bukti Sampai",
+      sortable: true,
+      selector: (row: any) =>
+        row?.image_arrived ? (
+          <Image alt="bukti" src={row?.image_arrived} width={50} height={50} />
         ) : (
           "-"
         ),
@@ -150,6 +173,7 @@ export default function Medicine({ table, session, stocks }: any) {
             title="Edit"
             color="primary"
             onClick={() => {
+              setSelectableData(JSON.parse(row?.stocks));
               setModal({ ...modal, open: true, data: row, key: "update" });
             }}
           >
@@ -174,18 +198,22 @@ export default function Medicine({ table, session, stocks }: any) {
       name: "Produk",
       sortable: true,
       selector: (row: any) =>
-        row?.products?.map(
-          (v: any, i: number) => `${i + 1}. ${v?.name}${(<br />)}`
-        ),
+        JSON.parse(row?.products)?.map((v: any, i: number) => (
+          <p>
+            {i + 1}. {v?.name}
+            <br />
+          </p>
+        )),
     },
     {
       name: "Toko Tujuan",
       sortable: true,
       selector: (row: any) => row?.store_name || "-",
-    }
+    },
   ];
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [selected, setSelected] = useState<any>();
 
   const onSubmit = async (e: any) => {
     e?.preventDefault();
@@ -194,11 +222,13 @@ export default function Medicine({ table, session, stocks }: any) {
     try {
       const payload = {
         ...formData,
-        price: formData?.price?.replaceAll(".", ""),
+        delivered_by: { id: selected?.id, name: selected?.name },
+        deliver_at: moment().format("YYYY-MM-DD hh:mm"),
+        stocks: selectableData,
       };
       if (formData?.id) {
         const result = await axios.patch(
-          CONFIG.base_url_api + `/store`,
+          CONFIG.base_url_api + `/delivery`,
           payload,
           {
             headers: {
@@ -209,7 +239,7 @@ export default function Medicine({ table, session, stocks }: any) {
         );
       } else {
         const result = await axios.post(
-          CONFIG.base_url_api + `/store`,
+          CONFIG.base_url_api + `/delivery`,
           payload,
           {
             headers: {
@@ -237,7 +267,7 @@ export default function Medicine({ table, session, stocks }: any) {
       setLoading(true);
       const formData = Object.fromEntries(new FormData(e.target));
       const result = await axios.delete(
-        CONFIG.base_url_api + `/store?id=${formData?.id}`,
+        CONFIG.base_url_api + `/delivery?id=${formData?.id}`,
         {
           headers: {
             "bearer-token": "stokinventoryapi",
@@ -329,64 +359,71 @@ export default function Medicine({ table, session, stocks }: any) {
                   value={modal?.data?.id || null}
                 />
               )}
-              {show && (
-                <DataTable
-                  pagination
-                  onChangePage={(pageData) => {
-                    setFilter({ ...filter, page: pageData });
+              <div className="mt-5">
+                {show && (
+                  <DataTable
+                    pagination
+                    onChangePage={(pageData) => {
+                      setFilter({ ...filter, page: pageData });
+                    }}
+                    onChangeRowsPerPage={(currentRow, currentPage) => {
+                      setFilter({
+                        ...filter,
+                        page: currentPage,
+                        size: currentRow,
+                      });
+                    }}
+                    responsive={true}
+                    paginationTotalRows={stocks?.total_items}
+                    paginationDefaultPage={1}
+                    paginationServer={true}
+                    striped
+                    columns={StockColumn}
+                    data={stocks?.items || []}
+                    selectableRows
+                    selectableRowSelected={selectableData}
+                    onSelectedRowsChange={(state: any) =>
+                      setSelectableData(state.selectedRows)
+                    }
+                    customStyles={CustomTableStyle}
+                  />
+                )}
+              </div>
+              <div className="mt-2">
+                <label htmlFor="user" className="text-gray-500">
+                  Kurir
+                </label>
+                <ReactSelect
+                  id="user"
+                  menuPlacement="top"
+                  name="user"
+                  required
+                  options={couriers?.map((v: any) => ({
+                    ...v,
+                    value: v?.id,
+                    label: v?.name,
+                  }))}
+                  onChange={(e) => {
+                    setSelected(e);
                   }}
-                  onChangeRowsPerPage={(currentRow, currentPage) => {
-                    setFilter({
-                      ...filter,
-                      page: currentPage,
-                      size: currentRow,
-                    });
+                  defaultValue={{
+                    value:
+                      modal.key == "update"
+                        ? couriers?.find(
+                            (v: any) =>
+                              v.id == JSON.parse(modal?.data?.delivered_by)?.id
+                          )?.id
+                        : "",
+                    label:
+                      modal.key == "update"
+                        ? couriers?.find(
+                            (v: any) =>
+                              v.id == JSON.parse(modal?.data?.delivered_by)?.id
+                          )?.name
+                        : "Pilih Kurir",
                   }}
-                  responsive={true}
-                  paginationTotalRows={stocks?.total_items}
-                  paginationDefaultPage={1}
-                  paginationServer={true}
-                  striped
-                  columns={StockColumn}
-                  data={stocks?.items}
-                  customStyles={CustomTableStyle}
                 />
-              )}
-              {/* <Input
-                label="Nama Toko"
-                placeholder="Masukkan Nama Toko"
-                name="name"
-                defaultValue={modal?.data?.name || ""}
-                required
-              />
-              <Input
-                label="Kode"
-                placeholder="Masukkan Kode"
-                name="code"
-                defaultValue={modal?.data?.code || ""}
-                required
-              />
-              <Input
-                label="Alamat"
-                placeholder="Masukkan Alamat"
-                name="address"
-                defaultValue={modal?.data?.address || ""}
-                required
-              />
-              <Input
-                label="Latitude"
-                placeholder="Masukkan Latitude"
-                name="lat"
-                defaultValue={modal?.data?.lat || ""}
-                isOptional
-              />
-              <Input
-                label="Longitude"
-                placeholder="Masukkan Longitude"
-                name="long"
-                defaultValue={modal?.data?.long || ""}
-                isOptional
-              /> */}
+              </div>
 
               <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
                 <div>
@@ -455,6 +492,85 @@ export default function Medicine({ table, session, stocks }: any) {
                 </div>
               </div>
             </form>
+          </Modal>
+        ) : (
+          ""
+        )}
+
+        {modal?.key == "view" ? (
+          <Modal
+            open={modal.open}
+            setOpen={() => setModal({ ...modal, open: false })}
+          >
+            <h2 className="text-xl font-bold text-center">
+              Barang Keluar
+            </h2>
+            <div className="flex gap-2 justify-between mt-4">
+              <div className="bg-green-200 rounded p-2 w-full">
+                <h5 className="font-bold text-lg text-center">Stok ID</h5>
+              </div>
+              <div className="bg-green-200 rounded p-2 w-full">
+                <h5 className="font-bold text-lg text-center">Jumlah Produk</h5>
+              </div>
+              <div className="bg-green-200 rounded p-2 w-full">
+                <h5 className="font-bold text-lg text-center">Toko Tujuan</h5>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-between">
+              <div className="bg-slate-100 rounded p-2 w-full">
+                {JSON.parse(modal?.data?.stocks)?.length > 0 &&
+                  JSON.parse(modal?.data?.stocks)?.map(
+                    (v: any, i: number) => (
+                      <p
+                        key={i}
+                        className={`${
+                          i !== 0 ? "mt-2" : ""
+                        } font-semibold text-center border-b-2 border-b-gray-800`}
+                      >
+                        {v?.id}
+                      </p>
+                    )
+                  )}
+              </div>
+              <div className="bg-slate-100 rounded p-2 w-full">
+                {JSON.parse(modal?.data?.stocks)?.map((v: any, i: number) => (
+                  <p
+                    className={`${
+                      i !== 0 ? "mt-2" : ""
+                    } text-center font-semibold border-b-2 border-b-gray-800`}
+                    key={i}
+                  >
+                    {v?.qty} Kg
+                  </p>
+                ))}
+              </div>
+              <div className="bg-slate-100 rounded p-2 w-full">
+                {JSON.parse(modal?.data?.stocks)?.map((v: any, i: number) => (
+                  <p
+                    className={`${
+                      i !== 0 ? "mt-2" : ""
+                    } text-center font-semibold border-b-2 border-b-gray-800`}
+                    key={i}
+                  >
+                    {v?.store_name}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2 lg:flex-row flex-col-reverse justify-end">
+              <div>
+                <Button
+                  color="white"
+                  type="button"
+                  onClick={() => {
+                    setModal({ open: false });
+                  }}
+                >
+                  Kembali
+                </Button>
+              </div>
+            </div>
           </Modal>
         ) : (
           ""

@@ -83,12 +83,31 @@ export default function User({ table, session, stores }: any) {
     const queryFilter = new URLSearchParams(filter).toString();
     router.push(`?${queryFilter}`);
   }, [filter]);
-  const STORES = [{value:"", label:"Pilih Toko"},
+  const STORES = [
+    { value: "", label: "Pilih Toko" },
     ...stores?.map((v: any) => ({
       ...v,
       value: v?.id,
       label: v?.name,
     })),
+  ];
+  const roles = [
+    {
+      value: "super_admin",
+      label: "Super Admin",
+    },
+    {
+      value: "admin_warehouse",
+      label: "Admin Gudang",
+    },
+    {
+      value: "admin_store",
+      label: "Admin Toko",
+    },
+    {
+      value: "courier",
+      label: "Kurir",
+    },
   ];
   const CustomerColumn: any = [
     {
@@ -115,11 +134,7 @@ export default function User({ table, session, stores }: any) {
       name: "Peran",
       sortable: true,
       selector: (row: any) =>
-        row?.role == "super_admin"
-          ? "SUPER ADMIN"
-          : row?.role == "admin_warehouse"
-          ? "ADMIN GUDANG"
-          : "ADMIN TOKO",
+        roles?.find((v: any) => v.value == row?.role)?.label
     },
     {
       name: "Status",
@@ -160,15 +175,15 @@ export default function User({ table, session, stores }: any) {
     setInfo({ ...info, loading: true });
     const formData = Object.fromEntries(new FormData(e.target));
     let store = null;
-    if(formData?.store){
-      store = STORES?.find((v:any) => v?.id == formData?.store)
+    if (formData?.store) {
+      store = STORES?.find((v: any) => v?.id == formData?.store);
     }
     try {
       const payload = {
         ...formData,
         store_id: store?.id,
         store_name: store?.name,
-        store_code: store?.code
+        store_code: store?.code,
       };
       if (formData?.id) {
         const result = await axios.patch(
@@ -242,20 +257,6 @@ export default function User({ table, session, stores }: any) {
       console.log(error);
     }
   };
-  const roles = [
-    {
-      value: "super_admin",
-      label: "Super Admin",
-    },
-    {
-      value: "admin_warehouse",
-      label: "Admin Gudang",
-    },
-    {
-      value: "admin_store",
-      label: "Admin Toko",
-    },
-  ];
   return (
     <div>
       <h2 className="text-2xl font-semibold">Akses Admin</h2>
