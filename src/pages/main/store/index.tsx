@@ -30,7 +30,7 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/stores?page=${+page || 1}&size=${+size || 10}&search=${search || ""}`,
+        `/stores?pagination=true&page=${+page - 1 || 0}&size=${+size || 10}&search=${search || ""}`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",

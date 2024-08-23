@@ -29,7 +29,7 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/products?page=${+page || 1}&size=${+size || 10}&search=${
+        `/products?pagination=true&page=${+page - 1 || 0}&size=${+size || 10}&search=${
           search || ""
         }`,
       {

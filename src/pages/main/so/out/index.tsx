@@ -37,7 +37,7 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/stocks?page=${+page || 1}&size=${+size || 10}&search=${
+        `/stocks?pagination=true&page=${+page - 1 || 0}&size=${+size || 10}&search=${
           search || ""
         }&type=out`,
       {
@@ -47,7 +47,6 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
-    console.log(result?.data?.items[0]);
     const products = await axios.get(
       CONFIG.base_url_api +
         `/products?page=${+page || 1}&size=${+size || 100}&search=${
