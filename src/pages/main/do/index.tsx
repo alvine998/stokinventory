@@ -6,10 +6,13 @@ import { CONFIG } from "@/config";
 import { toMoney } from "@/utils";
 import axios from "axios";
 import { getCookie } from "cookies-next";
+import jsPDF from "jspdf";
 import {
+  CircleDivideIcon,
   ClipboardList,
   PencilIcon,
   PlusIcon,
+  PrinterIcon,
   SaveAllIcon,
   Trash2Icon,
   TrashIcon,
@@ -87,6 +90,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
   const [selectableData, setSelectableData] = useState<any>();
+  const [progress, setProgress] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -96,6 +100,40 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
     const queryFilter = new URLSearchParams(filter).toString();
     router.push(`?${queryFilter}`);
   }, [filter]);
+  const generatePDF = async () => {
+    setProgress(true);
+    console.log(session?.logo);
+    try {
+      let doc: any = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: [279, 241],
+      });
+
+      doc.setFontSize(20);
+      doc.setFont("helvetica", "bold");
+      doc.text("Delivery Invoice", 10, 20);
+      doc.text(session?.logo ? "" : "StokInventory", 200, 20);
+      session?.logo && // Fetch the image from the URL and convert it to Base64
+        fetch(session?.logo)
+          .then((response) => response.blob())
+          .then((blob) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64data = reader.result;
+              doc.addImage(base64data, "PNG", 150, 20, 150, 150); // Adjust position and size
+            };
+            reader.readAsDataURL(blob);
+          })
+          .catch((error) => console.error("Image fetch error:", error));
+
+      doc.save("Delivery Invoice.pdf");
+      setProgress(false);
+    } catch (error) {
+      setProgress(false);
+      console.log(error);
+    }
+  };
   const CustomerColumn: any = [
     {
       name: "Stock Out",
@@ -169,6 +207,23 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
       right: true,
       selector: (row: any) => (
         <div className="flex gap-2">
+          {/* <Button
+            title="Cetak"
+            color="print"
+            onClick={() => {
+              generatePDF();
+            }}
+            className={"flex gap-2 items-center w-full"}
+          >
+            {progress ? (
+              <>
+                <CircleDivideIcon className="w-5 h-5 animate-spin" />
+                <p>Mencetak...</p>
+              </>
+            ) : (
+              <PrinterIcon className="w-5 h-5" />
+            )}
+          </Button> */}
           <Button
             title="Edit"
             color="primary"
@@ -199,7 +254,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
       sortable: true,
       selector: (row: any) =>
         JSON.parse(row?.products)?.map((v: any, i: number) => (
-          <p>
+          <p key={i}>
             {i + 1}. {v?.name}
             <br />
           </p>
@@ -502,9 +557,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
             open={modal.open}
             setOpen={() => setModal({ ...modal, open: false })}
           >
-            <h2 className="text-xl font-bold text-center">
-              Barang Keluar
-            </h2>
+            <h2 className="text-xl font-bold text-center">Barang Keluar</h2>
             <div className="flex gap-2 justify-between mt-4">
               <div className="bg-green-200 rounded p-2 w-full">
                 <h5 className="font-bold text-lg text-center">Stok ID</h5>
@@ -519,18 +572,16 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
             <div className="flex gap-2 justify-between">
               <div className="bg-slate-100 rounded p-2 w-full">
                 {JSON.parse(modal?.data?.stocks)?.length > 0 &&
-                  JSON.parse(modal?.data?.stocks)?.map(
-                    (v: any, i: number) => (
-                      <p
-                        key={i}
-                        className={`${
-                          i !== 0 ? "mt-2" : ""
-                        } font-semibold text-center border-b-2 border-b-gray-800`}
-                      >
-                        {v?.id}
-                      </p>
-                    )
-                  )}
+                  JSON.parse(modal?.data?.stocks)?.map((v: any, i: number) => (
+                    <p
+                      key={i}
+                      className={`${
+                        i !== 0 ? "mt-2" : ""
+                      } font-semibold text-center border-b-2 border-b-gray-800`}
+                    >
+                      {v?.id}
+                    </p>
+                  ))}
               </div>
               <div className="bg-slate-100 rounded p-2 w-full">
                 {JSON.parse(modal?.data?.stocks)?.map((v: any, i: number) => (
