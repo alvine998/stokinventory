@@ -3,7 +3,7 @@ import React, { ButtonHTMLAttributes } from 'react'
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
     children: any,
-    color?: 'primary' | 'danger' | 'info' | 'warning' | 'white' | 'tabs',
+    color?: 'primary' | 'danger' | 'info' | 'warning' | 'white' | 'tabs' | 'print',
     className?: any;
 }
 
@@ -36,6 +36,12 @@ export default function Button(props: Props) {
             {
                 color == 'info' &&
                 <button {...props} className={'w-full p-1 bg-blue-700 hover:bg-blue-500 duration-150 transition-all rounded-md text-white ' + className}>
+                    {children}
+                </button>
+            }
+            {
+                color == 'print' &&
+                <button {...props} className={'w-full p-1 bg-violet-700 hover:bg-violet-500 duration-150 transition-all rounded-md text-white ' + className}>
                     {children}
                 </button>
             }
