@@ -5,11 +5,12 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { deleteCookie, getCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import {
   ArchiveRestoreIcon,
   ArrowLeftRightIcon,
   BookIcon,
+  Boxes,
   BoxesIcon,
   BoxIcon,
   Building2Icon,
@@ -23,6 +24,7 @@ import {
   NewspaperIcon,
   PencilIcon,
   PillIcon,
+  ShellIcon,
   SquareActivityIcon,
   StethoscopeIcon,
   StoreIcon,
@@ -38,13 +40,16 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { ReactNode } from "react";
+import ReactSelect from "react-select";
 
 export default function NavbarDesktop({
   children,
   session,
+  partners,
 }: {
   children: ReactNode;
   session: any;
+  partners: any;
 }) {
   const router = useRouter();
 
@@ -94,6 +99,11 @@ export default function NavbarDesktop({
       href: `/main/recipe`,
       icon: <ClipboardCheckIcon />,
     },
+    {
+      name: "Transaksi",
+      href: `/main/transaction`,
+      icon: <Boxes />,
+    },
     session?.role == "super_admin" && {
       name: "Akses Admin",
       href: `/main/user`,
@@ -111,13 +121,37 @@ export default function NavbarDesktop({
         icon: <HandshakeIcon />,
       },
   ]?.filter((v: any) => v !== false);
+  console.log(session);
   return (
     <div>
       {/* Topbar */}
-      <div className="bg-blue-200 w-full h-10 flex justify-end items-center px-10">
-        {/* <button className='flex items-center gap-2'>
-                   
-                </button> */}
+      <div className="bg-blue-200 w-full h-14 flex justify-end items-center px-10">
+        {session?.email?.includes("@stokinventory.com") &&
+        session?.role == "super_admin" ? (
+          <div className="mr-4 w-1/4">
+            <ReactSelect
+              options={partners?.map((v: any) => ({
+                ...v,
+                value: v?.package_name,
+                label: v?.name,
+              }))}
+              defaultValue={{
+                value: session?.partner_code || "id.app.stokinventory",
+                label: partners?.find((v:any) => v?.package_name == session?.partner_code) || "stokinventory",
+              }}
+              onChange={(e: any) => {
+                setCookie(
+                  "session",
+                  JSON.stringify({ ...session, partner_code: e?.value })
+                );
+                router.push('')
+              }}
+            />
+          </div>
+        ) : (
+          ""
+        )}
+
         <Menu>
           <MenuButton className={"flex gap-2 items-center"}>
             <p className="text-blue-500">
@@ -174,6 +208,9 @@ export default function NavbarDesktop({
               </h2>
             )}
           </div>
+          <div className="px-2">
+            <hr className="border-white" />
+          </div>
           <div className="flex flex-col mt-5">
             {navs?.map((v: any) => (
               <button
@@ -194,7 +231,7 @@ export default function NavbarDesktop({
             ))}
           </div>
         </div>
-        <main className="container mt-5 ml-[280px] px-10 h-[90vh] w-full overflow-y-auto">
+        <main className="container mt-5 ml-[280px] px-10 h-[85vh] w-full overflow-y-auto">
           {children}
         </main>
       </div>

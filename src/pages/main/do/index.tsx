@@ -113,19 +113,14 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
       doc.setFontSize(20);
       doc.setFont("helvetica", "bold");
       doc.text("Delivery Invoice", 10, 20);
-      doc.text(session?.logo ? "" : "StokInventory", 200, 20);
-      session?.logo && // Fetch the image from the URL and convert it to Base64
-        fetch(session?.logo)
-          .then((response) => response.blob())
-          .then((blob) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const base64data = reader.result;
-              doc.addImage(base64data, "PNG", 150, 20, 150, 150); // Adjust position and size
-            };
-            reader.readAsDataURL(blob);
-          })
-          .catch((error) => console.error("Image fetch error:", error));
+      if (session?.logo) {
+        let img = document.createElement('img')
+        img.src = session?.logo
+        console.log(img);
+        doc.addImage(img, "PNG", 150, 20, 150, 150); // Adjust position and size
+      } else {
+        doc.text("StokInventory", 200, 20);
+      }
 
       doc.save("Delivery Invoice.pdf");
       setProgress(false);
@@ -207,7 +202,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
       right: true,
       selector: (row: any) => (
         <div className="flex gap-2">
-          {/* <Button
+          <Button
             title="Cetak"
             color="print"
             onClick={() => {
@@ -223,7 +218,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
             ) : (
               <PrinterIcon className="w-5 h-5" />
             )}
-          </Button> */}
+          </Button>
           <Button
             title="Edit"
             color="primary"

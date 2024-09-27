@@ -6,8 +6,9 @@ import { useRouter } from "next/router";
 import { getCookie } from "cookies-next";
 import axios from "axios";
 import { CONFIG } from "@/config";
+import NavbarHomeDesktop from "../navbar/NavbarHomeDesktop";
 
-export default function LayoutDashboard({ children }: { children: ReactNode }) {
+export default function LayoutHome({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [session, setSession] = useState<any>();
   const [partners, setPartners] = useState<any>([]);
@@ -37,14 +38,14 @@ export default function LayoutDashboard({ children }: { children: ReactNode }) {
   return (
     <section className="min-h-screen overflow-x-hidden relative">
       <Head>
-        <title>Dashboard - StokInventory</title>
+        <title>StokInventory</title>
       </Head>
       <div className="lg:block hidden">
-        <NavbarDesktop session={session} partners={partners}>{children}</NavbarDesktop>
+        <NavbarHomeDesktop>{children}</NavbarHomeDesktop>
       </div>
-      <div className="lg:hidden block">
+      {/* <div className="lg:hidden block">
         <NavbarMobile session={session}>{children}</NavbarMobile>
-      </div>
+      </div> */}
     </section>
   );
 }
