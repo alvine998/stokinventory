@@ -80,12 +80,12 @@ export default function NavbarDesktop({
       icon: <ArrowLeftRightIcon />,
     },
     {
-      name: "Order",
+      name: "Request Toko",
       href: `/main/po`,
       icon: <ClipboardListIcon />,
     },
     session?.role !== "admin_store" && {
-      name: "Delivery",
+      name: "Pengiriman",
       href: `/main/do`,
       icon: <ArchiveRestoreIcon />,
     },
@@ -121,7 +121,6 @@ export default function NavbarDesktop({
         icon: <HandshakeIcon />,
       },
   ]?.filter((v: any) => v !== false);
-  console.log(session);
   return (
     <div>
       {/* Topbar */}
@@ -191,7 +190,7 @@ export default function NavbarDesktop({
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="bg-blue-200 w-1/5 h-[100vh] absolute z-10 top-0 left-0 pt-2">
+        <div className="bg-blue-200 w-1/5 h-[100vh] overflow-auto absolute z-10 top-0 left-0 pt-2">
           <div className="flex justify-center items-center gap-5">
             {session?.logo ? (
               <Image

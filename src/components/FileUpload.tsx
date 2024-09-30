@@ -34,6 +34,7 @@ export default function FileUpload(props: Props) {
           <div className="flex flex-col gap-2 justify-center items-center">
             <FolderUpIcon className="w-10 h-10 text-blue-500" />
             <p>Upload Disini</p>
+            <a href={image?.preview} target="_blank">Lihat</a>
           </div>
         )}
       </button>

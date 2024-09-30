@@ -406,7 +406,7 @@ export default function Medicine({ table, session, products }: any) {
                     <div className="w-full">
                       <Input
                         disabled
-                        value={"gram"}
+                        value={v?.unit}
                         label={i == 0 ? "Satuan" : ""}
                       />
                     </div>
@@ -525,7 +525,7 @@ export default function Medicine({ table, session, products }: any) {
               <div className="bg-slate-100 rounded p-2 w-full">
                 {JSON.parse(modal?.data?.products)?.map((v: any, i: number) => (
                   <p className="text-center font-semibold" key={i}>
-                    {v?.measure} gr
+                    {v?.measure} {v?.unit}
                   </p>
                 ))}
               </div>

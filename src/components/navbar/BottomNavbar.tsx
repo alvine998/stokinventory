@@ -3,8 +3,8 @@ import React from "react";
 
 export default function BottomNavbar() {
   return (
-    <div className="bg-blue-300 h-[300px] w-full px-20 py-10 relative">
-      <div className="flex gap-[200px]">
+    <div className="bg-blue-300 h-[300px] w-full px-10 py-10 relative">
+      <div className="flex gap-[100px]">
         <div>
           <a className="text-3xl text-blue-700 font-bold font-sans" href="/">
             STOKINVENTORY.COM

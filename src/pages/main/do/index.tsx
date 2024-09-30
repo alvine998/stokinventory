@@ -103,6 +103,36 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
   const generatePDF = async () => {
     setProgress(true);
     console.log(session?.logo);
+    // Fetch the image and convert it to base64
+    // const imageToBase64 = (url: string): Promise<string> => {
+    //   return new Promise((resolve, reject) => {
+    //     if (typeof window === 'undefined') {
+    //       reject(new Error("window is not defined. This code should run in the browser."));
+    //       return;
+    //     }
+    //     let img: HTMLImageElement = new window.Image();
+    //     img.setAttribute('crossOrigin', 'anonymous');
+
+    //     img.onload = () => {
+    //       const canvas = document.createElement('canvas');
+    //       canvas.width = img.width;
+    //       canvas.height = img.height;
+
+    //       let ctx = canvas.getContext('2d');
+    //       if (ctx) {
+    //         ctx.drawImage(img, 0, 0);
+    //         const dataURL = canvas.toDataURL('image/jpeg');
+    //         resolve(dataURL);
+    //       } else {
+    //         reject(new Error("Failed to get 2D context from canvas."));
+    //       }
+    //     };
+
+    //     img.onerror = (error: any) => reject(error);
+    //     img.src = url;
+    //   });
+    // };
+
     try {
       let doc: any = new jsPDF({
         orientation: "landscape",
@@ -113,14 +143,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
       doc.setFontSize(20);
       doc.setFont("helvetica", "bold");
       doc.text("Delivery Invoice", 10, 20);
-      if (session?.logo) {
-        let img = document.createElement('img')
-        img.src = session?.logo
-        console.log(img);
-        doc.addImage(img, "PNG", 150, 20, 150, 150); // Adjust position and size
-      } else {
-        doc.text("StokInventory", 200, 20);
-      }
+      doc.text(session?.name?.toUpperCase(), 200, 20);
 
       doc.save("Delivery Invoice.pdf");
       setProgress(false);

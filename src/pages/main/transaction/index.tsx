@@ -63,6 +63,7 @@ export default function Medicine({ table, session }: any) {
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [items, setItems] = useState<any>([]);
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -86,7 +87,10 @@ export default function Medicine({ table, session }: any) {
     {
       name: "Stok",
       sortable: true,
-      selector: (row: any) => `${row?.stock || "0"} ${row?.unit}`,
+      selector: (row: any) =>
+        `${
+          row?.stock - (items?.find((v: any) => v?.id === row?.id)?.total || 0)
+        } ${row?.unit}`,
     },
     {
       name: "Harga Modal",
@@ -97,24 +101,59 @@ export default function Medicine({ table, session }: any) {
       name: "Aksi",
       right: true,
       selector: (row: any) => (
-        <div className="flex gap-2">
-          {/* <Button
-            title="Kurang"
-            color="danger"
-            onClick={() => {
-              setModal({ ...modal, open: true, data: row, key: "update" });
-            }}
-          >
-            <MinusIcon className="text-white w-5 h-5" />
-          </Button> */}
+        <div className="flex gap-2 items-center">
+          {items?.find((v: any) => v?.id === row?.id)?.total > 0 && (
+            <Button
+              title="Kurang"
+              color="danger"
+              onClick={() => {
+                const newItems = items?.map((v: any) => {
+                  if (v?.id === row?.id) {
+                    v.total -= 1;
+                    v.stock += 1;
+                  }
+                  return v;
+                });
+                setItems(newItems);
+              }}
+            >
+              <MinusIcon className="text-white w-4 h-4" />
+            </Button>
+          )}
+          <p>{items?.find((v: any) => v?.id === row?.id)?.total || 0}</p>
           <Button
             title="Tambah"
             color="primary"
             onClick={() => {
-              setModal({ ...modal, open: true, data: row, key: "delete" });
+              // setModal({ ...modal, open: true, data: row, key: "delete" });
+              if(row?.stock < 1 || items?.find((v: any) => v?.id === row?.id)?.stock < 1){
+                return Swal.fire({
+                  icon: "warning",
+                  text: "Stok tidak mencukupi"
+                })
+              }
+              if (items?.find((v: any) => v?.id === row?.id)) {
+                const newItems = items?.map((v: any) => {
+                  if (v?.id === row?.id) {
+                    v.total += 1;
+                    v.stock -= 1;
+                  }
+                  return v;
+                });
+                setItems(newItems);
+              } else {
+                setItems([
+                  ...items,
+                  {
+                    ...row,
+                    total: (+row?.total || 0) + 1,
+                    stock: +row?.stock - 1
+                  },
+                ]);
+              }
             }}
           >
-            <PlusIcon className="text-white w-5 h-5" />
+            <PlusIcon className="text-white w-4 h-4" />
           </Button>
         </div>
       ),
@@ -209,6 +248,16 @@ export default function Medicine({ table, session }: any) {
                 setFilter({ ...filter, search: e.target.value });
               }}
             />
+            <div>
+              <Button
+                type="button"
+                onClick={() => {
+                  setModal({ ...modal, open: true, data: items, key: "view" });
+                }}
+              >
+                Lihat Struk
+              </Button>
+            </div>
             <div className="mt-5">
               {show && (
                 <DataTable
@@ -234,9 +283,6 @@ export default function Medicine({ table, session }: any) {
                 />
               )}
             </div>
-          </div>
-          <div className="w-1/4 bg-gray-100 h-[70vh] rounded p-2">
-              <h2 className="font-semibold font-sans">{table?.items[0]?.name}</h2>
           </div>
         </div>
 
@@ -321,44 +367,65 @@ export default function Medicine({ table, session }: any) {
         ) : (
           ""
         )}
-        {modal?.key == "delete" ? (
+        {modal?.key == "view" ? (
           <Modal
             open={modal.open}
             setOpen={() => setModal({ ...modal, open: false })}
           >
-            <h2 className="text-xl font-semibold text-center">
-              Hapus Data Produk
-            </h2>
-            <form onSubmit={onRemove}>
-              <input type="hidden" name="id" value={modal?.data?.id} />
-              <p className="text-center my-2">
-                Apakah anda yakin ingin menghapus produk {modal?.data?.name}?
-              </p>
-              <div className="flex gap-2 lg:flex-row flex-col-reverse justify-end">
-                <div>
-                  <Button
-                    color="white"
-                    type="button"
-                    onClick={() => {
-                      setModal({ open: false });
-                    }}
-                  >
-                    Kembali
-                  </Button>
+            <h2 className="text-xl font-semibold text-center">RBP Group</h2>
+            <div>
+              <div
+                className="flex gap-2 justify-between items-center mt-4"
+              >
+                <div className="w-full">
+                  <p className="text-md font-semibold">Item</p>
                 </div>
-
-                <div>
-                  <Button
-                    color="danger"
-                    className={"flex gap-2 px-2 items-center justify-center"}
-                    disabled={loading}
-                  >
-                    <Trash2Icon className="w-4 h-4" />
-                    {loading ? "Menghapus..." : "Hapus"}
-                  </Button>
+                <div className="w-[150px]">
+                  <p className="text-md">Jumlah</p>
+                </div>
+                <div className="w-[150px]">
+                  <p className="text-md">
+                    Harga
+                  </p>
                 </div>
               </div>
-            </form>
+              {items
+                ?.filter((v: any) => v?.total > 0)
+                ?.map((item: any, index: number) => (
+                  <div
+                    key={index}
+                    className="flex gap-2 justify-between items-center mt-4"
+                  >
+                    <div className="w-full">
+                      <p className="text-xs font-semibold">{item?.name}</p>
+                    </div>
+                    <div className="w-[150px]">
+                      <p className="text-xs ml-4">{item?.total}</p>
+                    </div>
+                    <div className="w-[150px]">
+                      <p className="text-xs">
+                        Rp {toMoney(+item?.price * +item?.total)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              <div className="border-b-2 border-gray-700 w-full mt-2"></div>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-xs">Total Item</p>
+                <p>{items?.filter((v: any) => v?.total > 0)?.length}</p>
+              </div>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-xs">Total Harga</p>
+                <p>
+                  Rp{" "}
+                  {toMoney(
+                    items?.reduce((a: any, b: any) => a + b.price * b.total, 0)
+                  )}
+                </p>
+              </div>
+            </div>
+            <Button className={"mt-5"}>Simpan & Cetak</Button>
+            <Button type="button" onClick={()=>{setModal({...modal, open: false, data: null})}} color="white">Tutup</Button>
           </Modal>
         ) : (
           ""
