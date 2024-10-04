@@ -17,6 +17,7 @@ import {
   Trash2Icon,
   TrashIcon,
 } from "lucide-react";
+import moment from "moment";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
@@ -126,11 +127,14 @@ export default function Medicine({ table, session }: any) {
             color="primary"
             onClick={() => {
               // setModal({ ...modal, open: true, data: row, key: "delete" });
-              if(row?.stock < 1 || items?.find((v: any) => v?.id === row?.id)?.stock < 1){
+              if (
+                row?.stock < 1 ||
+                items?.find((v: any) => v?.id === row?.id)?.stock < 1
+              ) {
                 return Swal.fire({
                   icon: "warning",
-                  text: "Stok tidak mencukupi"
-                })
+                  text: "Stok tidak mencukupi",
+                });
               }
               if (items?.find((v: any) => v?.id === row?.id)) {
                 const newItems = items?.map((v: any) => {
@@ -147,7 +151,7 @@ export default function Medicine({ table, session }: any) {
                   {
                     ...row,
                     total: (+row?.total || 0) + 1,
-                    stock: +row?.stock - 1
+                    stock: +row?.stock - 1,
                   },
                 ]);
               }
@@ -372,11 +376,15 @@ export default function Medicine({ table, session }: any) {
             open={modal.open}
             setOpen={() => setModal({ ...modal, open: false })}
           >
-            <h2 className="text-xl font-semibold text-center">RBP Group</h2>
+            <h2 className="text-xl font-semibold text-center">
+              Struk Transaksi
+            </h2>
+            <h2 className="text-md font-semibold text-right">
+              Kasir: {session?.name}
+            </h2>
+            <p className="text-right">{moment().format("DD-MM-YYYY HH:mm")}</p>
             <div>
-              <div
-                className="flex gap-2 justify-between items-center mt-4"
-              >
+              <div className="flex gap-2 justify-between items-center mt-4">
                 <div className="w-full">
                   <p className="text-md font-semibold">Item</p>
                 </div>
@@ -384,9 +392,7 @@ export default function Medicine({ table, session }: any) {
                   <p className="text-md">Jumlah</p>
                 </div>
                 <div className="w-[150px]">
-                  <p className="text-md">
-                    Harga
-                  </p>
+                  <p className="text-md">Harga</p>
                 </div>
               </div>
               {items
@@ -425,7 +431,15 @@ export default function Medicine({ table, session }: any) {
               </div>
             </div>
             <Button className={"mt-5"}>Simpan & Cetak</Button>
-            <Button type="button" onClick={()=>{setModal({...modal, open: false, data: null})}} color="white">Tutup</Button>
+            <Button
+              type="button"
+              onClick={() => {
+                setModal({ ...modal, open: false, data: null });
+              }}
+              color="white"
+            >
+              Tutup
+            </Button>
           </Modal>
         ) : (
           ""

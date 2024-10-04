@@ -15,6 +15,7 @@ import {
   BoxIcon,
   Building2Icon,
   ChevronDownCircle,
+  ChevronRightIcon,
   ClipboardCheckIcon,
   ClipboardListIcon,
   CogIcon,
@@ -39,7 +40,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import ReactSelect from "react-select";
 
 export default function NavbarDesktop({
@@ -53,6 +54,8 @@ export default function NavbarDesktop({
 }) {
   const router = useRouter();
 
+  const [subgroup, setSubgroup] = useState<any>([]);
+
   const navs = [
     {
       name: "Dashboard",
@@ -60,19 +63,22 @@ export default function NavbarDesktop({
       icon: <HomeIcon />,
     },
     session?.role !== "admin_store" && {
-      name: "Data Produk",
-      href: `/main/product`,
+      name: "Master Data",
       icon: <BoxIcon />,
-    },
-    session?.role !== "admin_store" && {
-      name: "Data Supplier",
-      href: `/main/supplier`,
-      icon: <TruckIcon />,
-    },
-    session?.role !== "admin_store" && {
-      name: "Data Toko",
-      href: `/main/store`,
-      icon: <StoreIcon />,
+      children: [
+        {
+          name: "Data Produk",
+          href: `/main/product`,
+        },
+        {
+          name: "Data Supplier",
+          href: `/main/supplier`,
+        },
+        {
+          name: "Data Toko",
+          href: `/main/store`,
+        },
+      ],
     },
     session?.role !== "admin_store" && {
       name: "Stock",
@@ -103,6 +109,16 @@ export default function NavbarDesktop({
       name: "Transaksi",
       href: `/main/transaction`,
       icon: <Boxes />,
+    },
+    session?.role !== "admin_store" && {
+      name: "Laporan",
+      icon: <ClipboardListIcon />,
+      children: [
+        {
+          name: "Laporan Harian",
+          href: `/main/report/daily`,
+        }
+      ],
     },
     session?.role == "super_admin" && {
       name: "Akses Admin",
@@ -136,14 +152,17 @@ export default function NavbarDesktop({
               }))}
               defaultValue={{
                 value: session?.partner_code || "id.app.stokinventory",
-                label: partners?.find((v:any) => v?.package_name == session?.partner_code) || "stokinventory",
+                label:
+                  partners?.find(
+                    (v: any) => v?.package_name == session?.partner_code
+                  ) || "stokinventory",
               }}
               onChange={(e: any) => {
                 setCookie(
                   "session",
                   JSON.stringify({ ...session, partner_code: e?.value })
                 );
-                router.push('')
+                router.push("");
               }}
             />
           </div>
@@ -211,23 +230,82 @@ export default function NavbarDesktop({
             <hr className="border-white" />
           </div>
           <div className="flex flex-col mt-5">
-            {navs?.map((v: any) => (
-              <button
-                key={v?.name}
-                className={
-                  router.pathname == v?.href
-                    ? "text-xl flex gap-2 bg-white p-2 text-blue-500 pl-2"
-                    : "text-black text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-2"
-                }
-                type="button"
-                onClick={() => {
-                  router.push(v?.href);
-                }}
-              >
-                {v?.icon}
-                {v?.name}
-              </button>
-            ))}
+            {navs?.map((v: any) => {
+              if (v?.children) {
+                return (
+                  <div className="w-full">
+                    <button
+                      key={v?.name}
+                      className={
+                        router.pathname == v?.href
+                          ? "text-xl flex gap-2 justify-between items-end bg-white p-2 text-blue-500 pl-2 w-full"
+                          : "text-black text-xl flex gap-2 justify-between items-end hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-2 w-full"
+                      }
+                      type="button"
+                      onClick={() => {
+                        if (subgroup?.includes(v?.name)) {
+                          setSubgroup(
+                            subgroup?.filter(
+                              (val: any) => val !== v?.name
+                            )
+                          );
+                        } else {
+                          setSubgroup([...subgroup, v?.name]);
+                        }
+                      }}
+                    >
+                      <div className="flex gap-2">
+                        {v?.icon}
+                        {v?.name}
+                      </div>
+                      <div>
+                        <ChevronRightIcon className={`text-gray-500 transition-transform transform duration-500 ${subgroup?.includes(v?.name) ? "rotate-90" : "rotate-0"}`} />
+                      </div>
+                    </button>
+                    {subgroup?.includes(v?.name) &&
+                      v?.children?.map((val: any, i: number) => (
+                        <button
+                          key={i}
+                          className={
+                            router.pathname == val?.href
+                              ? "text-xl flex gap-2 justify-between bg-white p-2 text-blue-500 pl-5 w-full"
+                              : "text-black text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-5 w-full"
+                          }
+                          type="button"
+                          onClick={() => {
+                            router.push(val?.href);
+                          }}
+                        >
+                          <div className="flex gap-2">
+                            {val?.icon}
+                            {val?.name}
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                );
+              } else {
+                return (
+                  <button
+                    key={v?.name}
+                    className={
+                      router.pathname == v?.href
+                        ? "text-xl flex gap-2 justify-between bg-white p-2 text-blue-500 pl-2"
+                        : "text-black text-xl flex gap-2 hover:bg-white p-2 hover:text-blue-500 duration-200 transition-all pl-2"
+                    }
+                    type="button"
+                    onClick={() => {
+                      router.push(v?.href);
+                    }}
+                  >
+                    <div className="flex gap-2">
+                      {v?.icon}
+                      {v?.name}
+                    </div>
+                  </button>
+                );
+              }
+            })}
           </div>
         </div>
         <main className="container mt-5 ml-[280px] px-10 h-[85vh] w-full overflow-y-auto">
