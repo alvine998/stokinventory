@@ -10,6 +10,7 @@ import {
   ArchiveRestoreIcon,
   ArrowLeftRightIcon,
   BookIcon,
+  Boxes,
   BoxesIcon,
   BoxIcon,
   Building2Icon,
@@ -93,6 +94,11 @@ export default function NavbarMobile({
       name: "Daftar Resep",
       href: `/main/recipe`,
       icon: <ClipboardCheckIcon />,
+    },
+    {
+      name: "Transaksi",
+      href: `/main/transaction`,
+      icon: <Boxes />,
     },
     session?.role == "super_admin" && {
       name: "Akses Admin",
