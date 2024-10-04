@@ -6,9 +6,9 @@ export default function BottomNavbar() {
     <div className="bg-blue-300 h-[300px] w-full px-10 py-10 relative">
       <div className="flex gap-[100px]">
         <div>
-          <a className="text-3xl text-blue-700 font-bold font-sans" href="/">
+          <Link className="text-3xl text-blue-700 font-bold font-sans" href="/">
             STOKINVENTORY.COM
-          </a>
+          </Link>
         </div>
 
         <div className="flex justify-between gap-4">

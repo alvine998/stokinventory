@@ -230,10 +230,10 @@ export default function NavbarDesktop({
             <hr className="border-white" />
           </div>
           <div className="flex flex-col mt-5">
-            {navs?.map((v: any) => {
+            {navs?.map((v: any, i:number) => {
               if (v?.children) {
                 return (
-                  <div className="w-full">
+                  <div className="w-full" key={i}>
                     <button
                       key={v?.name}
                       className={

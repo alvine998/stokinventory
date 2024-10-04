@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 import BottomNavbar from "./BottomNavbar";
+import Link from "next/link";
 
 interface Props {
   children: any;
@@ -38,12 +39,12 @@ export default function NavbarHomeDesktop(props: Props) {
   return (
     <div>
       <div className="bg-blue-300 w-full h-20 flex justify-center items-center gap-40">
-        <a className="text-3xl text-blue-700 font-bold font-sans" href="/">
+        <Link className="text-3xl text-blue-700 font-bold font-sans" href="/">
           STOKINVENTORY.COM
-        </a>
+        </Link>
         <div className="flex gap-6">
           {tabs?.map((v: any, i: number) => (
-            <a
+            <Link
               href={v?.href}
               key={i}
               className={`text-lg font-bold font-sans ${
@@ -57,7 +58,7 @@ export default function NavbarHomeDesktop(props: Props) {
               } duration-200 transition-all`}
             >
               {v?.name}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
