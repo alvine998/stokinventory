@@ -61,11 +61,21 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
+    const recipes = await axios.get(
+      CONFIG.base_url_api + `/recipes?pagination=false`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
+    );
     return {
       props: {
         table: result?.data || [],
         stores: stores?.data?.items || [],
         products: products?.data?.items || [],
+        recipes: recipes?.data?.items || [],
         session,
       },
     };
@@ -79,7 +89,13 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session, stores, products }: any) {
+export default function Medicine({
+  table,
+  session,
+  stores,
+  products,
+  recipes,
+}: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
@@ -372,11 +388,18 @@ export default function Medicine({ table, session, stores, products }: any) {
                   <ReactSelect
                     id="products"
                     required
-                    options={product?.map((v: any) => ({
-                      ...v,
-                      value: v.id,
-                      label: v.name,
-                    }))}
+                    options={[
+                      ...product?.map((v: any) => ({
+                        ...v,
+                        value: v.id,
+                        label: v.name,
+                      })),
+                      ...recipes?.map((v: any) => ({
+                        ...v,
+                        value: v.id,
+                        label: v.name,
+                      })),
+                    ]}
                     placeholder="Pilih Produk"
                     onChange={(e: any) => {
                       setList({
@@ -509,7 +532,7 @@ export default function Medicine({ table, session, stores, products }: any) {
             setOpen={() => setModal({ ...modal, open: false })}
           >
             <h2 className="text-xl font-semibold text-center">
-              Hapus Data Toko
+              Hapus Data Laporan Harian
             </h2>
             <form onSubmit={onRemove}>
               <input type="hidden" name="id" value={modal?.data?.id} />

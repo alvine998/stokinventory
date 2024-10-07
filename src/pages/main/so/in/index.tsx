@@ -37,9 +37,9 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/stocks?pagination=true&page=${+page - 1 || 0}&size=${+size || 10}&search=${
-          search || ""
-        }&type=in`,
+        `/stocks?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}&type=in`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -235,6 +235,12 @@ export default function Medicine({
     setInfo({ ...info, loading: true });
     const formData = Object.fromEntries(new FormData(e.target));
     try {
+      if (!image) {
+        return Swal.fire({
+          icon: "warning",
+          text: "Harap lampirkan foto bukti",
+        });
+      }
       const payload = {
         ...formData,
         image: image,
@@ -326,7 +332,7 @@ export default function Medicine({
                 }
                 onClick={() => {
                   setList({ product: [] });
-                  setProduct(products)
+                  setProduct(products);
                   setModal({ ...modal, open: true, data: null, key: "create" });
                 }}
               >
@@ -587,7 +593,9 @@ export default function Medicine({
               open={modal.open}
               setOpen={() => setModal({ ...modal, open: false })}
             >
-              <h2 className="text-xl font-bold text-center">Produk Barang Masuk</h2>
+              <h2 className="text-xl font-bold text-center">
+                Produk Barang Masuk
+              </h2>
               <div className="flex gap-2 justify-between mt-4">
                 <div className="bg-green-200 rounded p-2 w-full">
                   <h5 className="font-bold text-lg text-center">Nama Produk</h5>

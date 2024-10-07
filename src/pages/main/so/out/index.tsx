@@ -37,9 +37,9 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/stocks?pagination=true&page=${+page - 1 || 0}&size=${+size || 10}&search=${
-          search || ""
-        }&type=out`,
+        `/stocks?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}&type=out`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -236,6 +236,12 @@ export default function Stock({
     setInfo({ ...info, loading: true });
     const formData = Object.fromEntries(new FormData(e.target));
     try {
+      if (!image) {
+        return Swal.fire({
+          icon: "warning",
+          text: "Harap lampirkan foto bukti",
+        });
+      }
       const payload = {
         ...formData,
         store_id: +formData?.store_id || null,
@@ -602,18 +608,19 @@ export default function Stock({
               </div>
               <div className="flex gap-2 justify-between">
                 <div className="bg-slate-100 rounded p-2 w-full">
-                  {JSON.parse(modal?.data?.products)?.length > 0 && JSON.parse(modal?.data?.products)?.map(
-                    (v: any, i: number) => (
-                      <p
-                        key={i}
-                        className={`${
-                          i !== 0 ? "mt-2" : ""
-                        } font-semibold text-center border-b-2 border-b-gray-800`}
-                      >
-                        {v?.name?.toUpperCase()}
-                      </p>
-                    )
-                  )}
+                  {JSON.parse(modal?.data?.products)?.length > 0 &&
+                    JSON.parse(modal?.data?.products)?.map(
+                      (v: any, i: number) => (
+                        <p
+                          key={i}
+                          className={`${
+                            i !== 0 ? "mt-2" : ""
+                          } font-semibold text-center border-b-2 border-b-gray-800`}
+                        >
+                          {v?.name?.toUpperCase()}
+                        </p>
+                      )
+                    )}
                 </div>
                 <div className="bg-slate-100 rounded p-2 w-full">
                   {JSON.parse(modal?.data?.products)?.map(
