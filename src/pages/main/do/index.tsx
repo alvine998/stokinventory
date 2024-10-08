@@ -89,7 +89,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
-  const [selectableData, setSelectableData] = useState<any>();
+  const [selectableData, setSelectableData] = useState<any>([]);
   const [progress, setProgress] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -102,36 +102,6 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
   }, [filter]);
   const generatePDF = async () => {
     setProgress(true);
-    console.log(session?.logo);
-    // Fetch the image and convert it to base64
-    // const imageToBase64 = (url: string): Promise<string> => {
-    //   return new Promise((resolve, reject) => {
-    //     if (typeof window === 'undefined') {
-    //       reject(new Error("window is not defined. This code should run in the browser."));
-    //       return;
-    //     }
-    //     let img: HTMLImageElement = new window.Image();
-    //     img.setAttribute('crossOrigin', 'anonymous');
-
-    //     img.onload = () => {
-    //       const canvas = document.createElement('canvas');
-    //       canvas.width = img.width;
-    //       canvas.height = img.height;
-
-    //       let ctx = canvas.getContext('2d');
-    //       if (ctx) {
-    //         ctx.drawImage(img, 0, 0);
-    //         const dataURL = canvas.toDataURL('image/jpeg');
-    //         resolve(dataURL);
-    //       } else {
-    //         reject(new Error("Failed to get 2D context from canvas."));
-    //       }
-    //     };
-
-    //     img.onerror = (error: any) => reject(error);
-    //     img.src = url;
-    //   });
-    // };
 
     try {
       let doc: any = new jsPDF({
@@ -143,7 +113,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
       doc.setFontSize(20);
       doc.setFont("helvetica", "bold");
       doc.text("Delivery Invoice", 10, 20);
-      doc.text(session?.name?.toUpperCase(), 200, 20);
+      doc.text(session?.partner?.name, 200, 20);
 
       doc.save("Delivery Invoice.pdf");
       setProgress(false);
@@ -154,7 +124,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
   };
   const CustomerColumn: any = [
     {
-      name: "Stock Out",
+      name: "Stok Keluar",
       sortable: true,
       selector: (row: any) => (
         <button
@@ -390,7 +360,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
                 }}
               >
                 <PlusIcon className="w-4" />
-                Delivery
+                Pengiriman
               </Button>
             </div>
           </div>
@@ -422,7 +392,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
             setOpen={() => setModal({ ...modal, open: false })}
           >
             <h2 className="text-xl font-semibold text-center">
-              {modal.key == "create" ? "Tambah" : "Ubah"} Delivery
+              {modal.key == "create" ? "Tambah" : "Ubah"} Pengiriman
             </h2>
             <form onSubmit={onSubmit}>
               {modal.key == "update" && (
@@ -432,8 +402,15 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
                   value={modal?.data?.id || null}
                 />
               )}
+               {modal.key == "update" && (
+                <input
+                  type="hidden"
+                  name="stocks"
+                  value={modal?.data?.stocks || null}
+                />
+              )}
               <div className="mt-5">
-                {show && (
+                {show && modal.key == "create" && (
                   <DataTable
                     pagination
                     onChangePage={(pageData) => {
@@ -454,7 +431,6 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
                     columns={StockColumn}
                     data={stocks?.items || []}
                     selectableRows
-                    selectableRowSelected={selectableData}
                     onSelectedRowsChange={(state: any) =>
                       setSelectableData(state.selectedRows)
                     }
@@ -533,7 +509,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
             setOpen={() => setModal({ ...modal, open: false })}
           >
             <h2 className="text-xl font-semibold text-center">
-              Hapus Delivery
+              Hapus Pengiriman
             </h2>
             <form onSubmit={onRemove}>
               <input type="hidden" name="id" value={modal?.data?.id} />

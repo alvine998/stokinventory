@@ -28,13 +28,13 @@ export default function Login() {
           headers: {"bearer-token": "stokinventoryapi"}
         }
       );
-      const logo = await axios.get(
+      const partner = await axios.get(
         CONFIG.base_url_api + `/partners?package_name=${result?.data?.user?.partner_code}`,
         {
           headers: {"bearer-token": "stokinventoryapi"}
         }
       );
-      setCookie("session", JSON.stringify({...result.data?.user, logo: logo.data?.items[0]?.logo}));
+      setCookie("session", JSON.stringify({...result.data?.user, partner: partner.data?.items[0]}));
       Swal.fire({
         icon: "success",
         text: `Selamat Datang ${result.data?.user?.name}`,

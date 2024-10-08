@@ -160,7 +160,7 @@ export default function NavbarDesktop({
               onChange={(e: any) => {
                 setCookie(
                   "session",
-                  JSON.stringify({ ...session, partner_code: e?.value })
+                  JSON.stringify({ ...session, partner_code: e?.value, partner: e })
                 );
                 router.push("");
               }}
@@ -211,10 +211,10 @@ export default function NavbarDesktop({
         {/* Sidebar */}
         <div className="bg-blue-200 w-1/5 h-[100vh] overflow-auto absolute z-10 top-0 left-0 pt-2">
           <div className="flex justify-center items-center gap-5">
-            {session?.logo ? (
+            {session?.partner?.logo ? (
               <Image
                 alt="logo"
-                src={session?.logo}
+                src={session?.partner?.logo}
                 layout="relative"
                 width={150}
                 height={150}
@@ -222,7 +222,7 @@ export default function NavbarDesktop({
               />
             ) : (
               <h2 className="text-blue-500 text-2xl text-center">
-                StokInventory
+                {session?.partner?.name?.toUpperCase()}
               </h2>
             )}
           </div>
