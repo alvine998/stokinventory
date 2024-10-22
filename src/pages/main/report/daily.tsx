@@ -400,6 +400,7 @@ export default function Medicine({
                         label: v.name,
                       })),
                     ]}
+                    className="z-50"
                     placeholder="Pilih Produk"
                     onChange={(e: any) => {
                       setList({

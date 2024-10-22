@@ -44,7 +44,7 @@ export default function Home() {
         </h2>
 
         <div className="flex items-start justify-between gap-4 mt-5">
-          <div className="bg-blue-600 rounded-lg w-full p-2 py-6">
+          <div className="bg-blue-600 rounded-lg w-full p-2 py-6 mt-0 hover:-mt-2 transition-all duration-300">
             <h5 className="text-white text-xl text-center font-semibold">
               Paket Basic
             </h5>
@@ -75,7 +75,7 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div className="bg-blue-600 rounded-lg w-full p-2 py-6">
+          <div className="bg-blue-600 rounded-lg w-full p-2 py-6 mt-0 hover:-mt-2 transition-all duration-300">
             <h5 className="text-white text-xl text-center font-semibold">
               Paket Pro
             </h5>
@@ -109,7 +109,7 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div className="bg-blue-600 rounded-lg w-full p-2 py-6">
+          <div className="bg-blue-600 rounded-lg w-full p-2 py-6 mt-0 hover:-mt-2 transition-all duration-300">
             <h5 className="text-white text-xl text-center font-semibold">
               Paket Enterprise
             </h5>
@@ -142,6 +142,15 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="border-b-2 border-gray-600 w-1/2 mx-auto mt-20"></div>
+
+      {/* Fitur Unggulan */}
+      <div className="mt-10 px-10">
+        <h2 className="text-3xl font-sans font-bold text-blue-600 text-center">
+          Fitur Unggulan
+        </h2>
       </div>
     </div>
   );

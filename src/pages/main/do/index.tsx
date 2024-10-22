@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import generateInvoice from "@/components/GenerateInvoice";
 import Input from "@/components/Input";
 import Modal, { useModal } from "@/components/Modal";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
@@ -122,6 +123,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
       console.log(error);
     }
   };
+
   const CustomerColumn: any = [
     {
       name: "Stok Keluar",
@@ -199,7 +201,19 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
             title="Cetak"
             color="print"
             onClick={() => {
-              generatePDF();
+              // generatePDF();
+
+              JSON.parse(row?.stocks)?.map((val: any) => {
+                const invoiceData = {
+                  invoiceNo: val?.id,
+                  date: val?.created_on,
+                  clientName: session?.partner?.name,
+                  clientAddress: val?.store_name,
+                  items: JSON.parse(val?.products),
+                  courier_name: JSON.parse(row?.delivered_by)?.name
+                };
+                generateInvoice(invoiceData);
+              });
             }}
             className={"flex gap-2 items-center w-full"}
           >
@@ -402,7 +416,7 @@ export default function Medicine({ table, session, stocks, couriers }: any) {
                   value={modal?.data?.id || null}
                 />
               )}
-               {modal.key == "update" && (
+              {modal.key == "update" && (
                 <input
                   type="hidden"
                   name="stocks"
