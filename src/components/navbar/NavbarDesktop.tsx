@@ -194,7 +194,7 @@ export default function NavbarDesktop({
                   type="button"
                   onClick={() => {
                     deleteCookie("session");
-                    router.push("/");
+                    router.push("/login");
                   }}
                   className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white text-red-500"
                 >
