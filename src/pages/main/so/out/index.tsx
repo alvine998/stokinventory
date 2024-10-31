@@ -4,6 +4,7 @@ import Input from "@/components/Input";
 import Modal, { useModal } from "@/components/Modal";
 import Radio from "@/components/Radio";
 import { CustomTableStyle } from "@/components/table/CustomTableStyle";
+import SOTabs from "@/components/tabs/StockTabs";
 import { CONFIG } from "@/config";
 import { storage } from "@/config/firebase";
 import { toMoney } from "@/utils";
@@ -25,7 +26,6 @@ import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import ReactSelect from "react-select";
 import Swal from "sweetalert2";
-import SOTabs from "..";
 
 export async function getServerSideProps(context: any) {
   try {
