@@ -72,6 +72,7 @@ export async function getServerSideProps(context: any) {
         detail: detail?.data?.items[0],
         stock: qty || [],
         session,
+        params
       },
     };
   } catch (error: any) {
@@ -84,7 +85,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session, detail, stock }: any) {
+export default function Medicine({ table, session, detail, stock, params }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
@@ -173,7 +174,7 @@ export default function Medicine({ table, session, detail, stock }: any) {
       });
       setLoading(false);
       setModal({ ...modal, open: false });
-      router.push("");
+      router.push(`/main/store/${params?.id}/detail`);
     } catch (error) {
       setLoading(false);
       console.log(error);
