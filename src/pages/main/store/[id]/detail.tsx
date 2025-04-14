@@ -6,10 +6,12 @@ import { CONFIG } from "@/config";
 import { toMoney } from "@/utils";
 import axios from "axios";
 import { getCookie } from "cookies-next";
-import { ArrowLeftCircleIcon } from "lucide-react";
+import { ArrowLeftCircleIcon, PlusIcon, SaveAllIcon } from "lucide-react";
+import moment from "moment";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
+import Swal from "sweetalert2";
 
 export async function getServerSideProps(context: any) {
   try {
@@ -62,7 +64,7 @@ export async function getServerSideProps(context: any) {
       } else {
         a.push({ id: b.id, name: b.name, code: b.code, stock: b.qty });
       }
-      return a
+      return a;
     }, []);
     return {
       props: {
@@ -70,6 +72,7 @@ export async function getServerSideProps(context: any) {
         detail: detail?.data?.items[0],
         stock: qty || [],
         session,
+        params
       },
     };
   } catch (error: any) {
@@ -82,11 +85,12 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session, detail, stock }: any) {
+export default function Medicine({ table, session, detail, stock, params }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
+  const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -105,7 +109,25 @@ export default function Medicine({ table, session, detail, stock }: any) {
     {
       name: "Stok",
       sortable: true,
-      selector: (row: any) => (stock?.find((v:any) => v?.id == row?.id)?.stock || 0) + ` ${row?.unit}` ,
+      selector: (row: any) =>
+        (stock?.find((v: any) => v?.id == row?.id)?.stock || 0) +
+        ` ${row?.unit}`,
+    },
+    {
+      name: "Aksi",
+      sortable: true,
+      selector: (row: any) => (
+        <div>
+          <Button
+            type="button"
+            onClick={() => {
+              setModal({ ...modal, open: true, key: "add", data: row });
+            }}
+          >
+            Ubah
+          </Button>
+        </div>
+      ),
     },
     // {
     //   name: "Masa Kadaluwarsa",
@@ -118,6 +140,51 @@ export default function Medicine({ table, session, detail, stock }: any) {
       selector: (row: any) => row?.status || "-",
     },
   ];
+
+  const onSubmit = async (e: any) => {
+    e?.preventDefault();
+    setLoading(true);
+    const formData: any = Object.fromEntries(new FormData(e.target));
+    try {
+      const payload = {
+        store_id: +formData?.store_id || null,
+        store_name: formData?.store_name,
+        image: "admin_input",
+        products: [{
+          id: formData?.product_id,
+          name: formData?.product_name,
+          expired_at: formData?.expired_at,
+          qty: +formData?.qty,
+          code: formData?.product_code
+        }],
+        qty: +formData?.qty,
+        logs: { id: session?.id, name: session?.name },
+        date: new Date(),
+        type: "out",
+        status: 2
+      };
+      const result = await axios.post(
+        CONFIG.base_url_api + `/stock/create/store`,
+        payload,
+        {
+          headers: {
+            "bearer-token": "stokinventoryapi",
+            "x-partner-code": session?.partner_code,
+          },
+        }
+      );
+      Swal.fire({
+        icon: "success",
+        text: "Data Berhasil Disimpan",
+      });
+      setLoading(false);
+      setModal({ ...modal, open: false });
+      router.push(`/main/store/${params?.id}/detail`);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -192,6 +259,65 @@ export default function Medicine({ table, session, detail, stock }: any) {
             />
           )}
         </div>
+
+        {modal?.key == "add" ? (
+          <Modal
+            open={modal.open}
+            setOpen={() => {
+              setModal({ ...modal, open: false });
+            }}
+          >
+            <h2 className="text-center text-xl font-bold">
+              Ubah Stok {modal?.data?.name}
+            </h2>
+            <form onSubmit={onSubmit}>
+              <div>
+                <input type="hidden" name="product_id" value={modal?.data?.id} />
+                <input type="hidden" name="product_name" value={modal?.data?.name} />
+                <input type="hidden" name="product_code" value={modal?.data?.code} />
+                <input type="hidden" name="store_id" value={detail?.id} />
+                <input type="hidden" name="store_name" value={detail?.name} />
+                <Input
+                  label={`Jumlah per ${modal?.data?.unit}`}
+                  placeholder="Masukkan Jumlah Produk"
+                  type="number"
+                  name={"qty"}
+                />
+                <Input
+                  label={`Tanggal Kadaluwarsa`}
+                  type="date"
+                  name={"expired_at"}
+                />
+              </div>
+              <div className="flex lg:gap-2 gap-0 lg:flex-row flex-col-reverse justify-end">
+                <div>
+                  <Button
+                    color="white"
+                    type="button"
+                    onClick={() => {
+                      setModal({ open: false });
+                    }}
+                  >
+                    Kembali
+                  </Button>
+                </div>
+
+                <div>
+                  <Button
+                    color="info"
+                    className={"flex gap-2 px-2 items-center justify-center"}
+                    disabled={loading}
+                  >
+                    <SaveAllIcon className="w-4 h-4" />
+                    {loading ? "Menyimpan..." : "Simpan"}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </Modal>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );
