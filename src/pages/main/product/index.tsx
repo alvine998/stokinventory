@@ -29,9 +29,9 @@ export async function getServerSideProps(context: any) {
     }
     const result = await axios.get(
       CONFIG.base_url_api +
-        `/products?pagination=true&page=${+page - 1 || 0}&size=${+size || 10}&search=${
-          search || ""
-        }`,
+        `/products?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}`,
       {
         headers: {
           "bearer-token": "stokinventoryapi",
@@ -91,6 +91,11 @@ export default function Medicine({ table, session }: any) {
       selector: (row: any) => toMoney(row?.price) || "0",
     },
     {
+      name: "Harga Jual",
+      sortable: true,
+      selector: (row: any) => toMoney(row?.selling_price) || "0",
+    },
+    {
       name: "Min Order",
       sortable: true,
       selector: (row: any) => `${row?.moq || "0"} ${row?.unit}`,
@@ -133,6 +138,7 @@ export default function Medicine({ table, session }: any) {
       const payload = {
         ...formData,
         price: formData?.price?.replaceAll(".", ""),
+        selling_price: formData?.selling_price?.replaceAll(".", ""),
       };
       if (formData?.id) {
         const result = await axios.patch(
@@ -213,7 +219,7 @@ export default function Medicine({ table, session }: any) {
             />
           </div>
           <div className="lg:w-auto w-full flex gap-2">
-            <div className="w-auto">
+            {/* <div className="w-auto">
               <Button
                 type="button"
                 color="primary"
@@ -227,7 +233,7 @@ export default function Medicine({ table, session }: any) {
                 <ClipboardList className="w-4" />
                 Perkiraan Harga Jual
               </Button>
-            </div>
+            </div> */}
             <div className="w-auto">
               {session?.role !== "admin_store" ? (
                 <Button
@@ -302,6 +308,7 @@ export default function Medicine({ table, session }: any) {
                 label="Kode"
                 placeholder="Masukkan Kode"
                 name="code"
+                readOnly={modal.key == "update"}
                 defaultValue={modal?.data?.code || ""}
                 required
               />
@@ -311,6 +318,14 @@ export default function Medicine({ table, session }: any) {
                 placeholder="Masukkan Harga Modal"
                 name="price"
                 defaultValue={modal?.data?.price || ""}
+                required
+              />
+              <Input
+                isCurrency
+                label="Harga Jual"
+                placeholder="Masukkan Harga Jual"
+                name="selling_price"
+                defaultValue={modal?.data?.selling_price || ""}
                 required
               />
               <Input

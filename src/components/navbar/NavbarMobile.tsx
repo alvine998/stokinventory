@@ -105,11 +105,11 @@ export default function NavbarMobile({
       href: `/main/user`,
       icon: <Users2Icon />,
     },
-    //   {
-    //     name: "Pengaturan",
-    //     href: `/main/setting`,
-    //     icon: <CogIcon />,
-    //   },
+    {
+      name: "Dokumentasi",
+      href: `/main/documentation`,
+      icon: <NewspaperIcon />,
+    },
     session?.email?.includes("stokinventory.com") &&
       session?.is_stokinv_admin == 1 && {
         name: "Partner",

@@ -25,6 +25,7 @@ import {
   NewspaperIcon,
   PencilIcon,
   PillIcon,
+  SendToBackIcon,
   ShellIcon,
   SquareActivityIcon,
   StethoscopeIcon,
@@ -85,6 +86,11 @@ export default function NavbarDesktop({
       href: `/main/so/in`,
       icon: <ArrowLeftRightIcon />,
     },
+    session?.role !== "admin_store" && {
+      name: "Refund Produk",
+      href: `/main/refund`,
+      icon: <SendToBackIcon />,
+    },
     {
       name: "Request Toko",
       href: `/main/po`,
@@ -125,11 +131,11 @@ export default function NavbarDesktop({
       href: `/main/user`,
       icon: <Users2Icon />,
     },
-    // {
-    //   name: "Pengaturan",
-    //   href: `/main/setting`,
-    //   icon: <CogIcon />,
-    // },
+    {
+      name: "Dokumentasi",
+      href: `/main/documentation`,
+      icon: <NewspaperIcon />,
+    },
     session?.email?.includes("stokinventory.com") &&
       session?.is_stokinv_admin == 1 && {
         name: "Partner",
@@ -194,7 +200,7 @@ export default function NavbarDesktop({
                   type="button"
                   onClick={() => {
                     deleteCookie("session");
-                    router.push("/");
+                    router.push("/login");
                   }}
                   className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-white text-red-500"
                 >

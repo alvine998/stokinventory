@@ -112,11 +112,11 @@ export default function Medicine({ table, session, detail, stock }: any) {
     //   sortable: true,
     //   selector: (row: any) => row?.expired_at || "-",
     // },
-    // {
-    //   name: "Status",
-    //   sortable: true,
-    //   selector: (row: any) => row?.status || "-",
-    // },
+    {
+      name: "Status",
+      sortable: true,
+      selector: (row: any) => row?.status || "-",
+    },
   ];
 
   return (
