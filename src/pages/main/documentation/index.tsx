@@ -107,7 +107,7 @@ export default function Documentation({ session }: any) {
               Data Toko
             </Link>
             <Link
-              href={"https://youtube.com/"}
+              href={"https://youtu.be/uK7XZtWE4ug"}
               className="text-blue-500 font-bold text-2xl shadow p-2 rounded w-full text-center hover:bg-gray-200 duration-150 transition-all"
               target="_blank"
             >
