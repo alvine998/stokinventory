@@ -84,7 +84,7 @@ export default function Documentation({ session }: any) {
         <div className="mt-5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Link
-              href={"https://youtube.com/"}
+              href={"https://youtu.be/Uvxd8rcn5UU"}
               className="text-blue-500 font-bold text-2xl shadow p-2 rounded w-full text-center hover:bg-gray-200 duration-150 transition-all"
               target="_blank"
             >
