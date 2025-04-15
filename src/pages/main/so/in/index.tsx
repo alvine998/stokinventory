@@ -236,10 +236,12 @@ export default function Medicine({
     const formData = Object.fromEntries(new FormData(e.target));
     try {
       if (!image) {
-        return Swal.fire({
+        Swal.fire({
           icon: "warning",
           text: "Harap lampirkan foto bukti",
         });
+        setInfo({ ...info, loading: false });
+        return
       }
       const payload = {
         ...formData,
@@ -430,7 +432,7 @@ export default function Medicine({
                   />
                 </div>
                 {list?.product?.map((v: any, i: number) => (
-                  <div key={i} className="mt-2 flex justify-between gap-2">
+                  <div key={i} className="flex justify-between gap-2">
                     <Input
                       value={v.label}
                       label={i == 0 ? "Nama Produk" : ""}
@@ -490,6 +492,7 @@ export default function Medicine({
                           products?.find((val: any) => val?.id == v?.id),
                         ]);
                       }}
+                      className={i == 0 ? "mt-5" : "-mt-1"}
                     >
                       <XCircleIcon className="text-red-500 w-7" />
                     </button>

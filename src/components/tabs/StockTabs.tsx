@@ -71,21 +71,20 @@ export default function SOTabs({ children }: any) {
       <div className="mt-5">
         <div className="flex gap-2">
           {navs?.map((v: any, i: number) => (
-            <Button
+            <button
               className={
                 router.pathname?.includes(v?.href)
-                  ? "bg-blue-500"
-                  : "bg-blue-700 hover:bg-blue-500"
+                  ? "border-b-blue-500 border-b-2 py-2 px-4 text-blue-700"
+                  : "hover:border-b-blue-500 hover:border-b-2 py-2 px-4 text-blue-700 duration-200 transition-all"
               }
               key={i}
-              color="tabs"
               type="button"
               onClick={() => {
                 router.push(v?.href);
               }}
             >
               {v?.label}
-            </Button>
+            </button>
           ))}
         </div>
 

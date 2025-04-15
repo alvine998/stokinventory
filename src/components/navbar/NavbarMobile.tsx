@@ -86,11 +86,12 @@ export default function NavbarMobile({
       icon: <ArchiveRestoreIcon />,
     },
     {
-      name: "Produk Kadaluwarsa",
+      name: "Kadaluwarsa",
       href: `/main/expired`,
       icon: <TriangleAlertIcon />,
     },
-    {
+    (session?.email?.includes("@rbpgroup.com") ||
+      session?.email?.includes("@stokinventory.com")) && {
       name: "Daftar Resep",
       href: `/main/recipe`,
       icon: <ClipboardCheckIcon />,

@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  nextjs:
+    container_name: stokinventory
+    build: .
+    ports:
+      - "3005:3005"
+    restart: always
+    command: ["bun", "run", "start", "--", "-p", "3005"]
