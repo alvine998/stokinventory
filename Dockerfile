@@ -1,6 +1,9 @@
 # Use the official Node.js image
 FROM node:18-alpine
 
+# Install curl dan bash
+RUN apt-get update && apt-get install -y curl bash && rm -rf /var/lib/apt/lists/*
+
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash
 
