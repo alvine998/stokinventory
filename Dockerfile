@@ -1,6 +1,12 @@
 # Use the official Node.js image
 FROM node:18-alpine
 
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+
+# Tambahkan bun ke PATH
+ENV PATH="/root/.bun/bin:$PATH"
+
 # Set the working directory inside the container
 WORKDIR /app
 
