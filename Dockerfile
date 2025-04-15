@@ -1,8 +1,8 @@
-# Use the official Node.js image
+# Use the official Node.js Alpine image
 FROM node:18-alpine
 
-# Install curl dan bash
-RUN apt-get update && apt-get install -y curl bash && rm -rf /var/lib/apt/lists/*
+# Install curl and bash (pakai apk, bukan apt-get)
+RUN apk add --no-cache curl bash
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash
@@ -25,8 +25,8 @@ COPY . .
 # Build the Next.js app
 RUN bun run build
 
-# Expose port 3000
+# Expose port 3005
 EXPOSE 3005
 
-# Start the Next.js app on port 3000
+# Start the Next.js app on port 3005
 CMD ["bun", "run", "start", "--", "-p", "3005"]
