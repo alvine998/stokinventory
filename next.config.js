@@ -8,9 +8,6 @@ const nextConfig = {
         hostname: "**",
       },
     ],
-  },
-  env: {
-    BASE_URL_API_STOKINVENTORY: 'https://stokinventory-api.vercel.app'
   }
 }
 

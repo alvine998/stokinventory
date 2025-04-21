@@ -94,9 +94,9 @@ export default function Medicine({ table, session }: any) {
         } ${row?.unit}`,
     },
     {
-      name: "Harga Modal",
+      name: "Harga",
       sortable: true,
-      selector: (row: any) => toMoney(row?.price) || "0",
+      selector: (row: any) => toMoney(row?.selling_price) || "0",
     },
     session?.role !== "admin_store" && {
       name: "Aksi",
@@ -379,7 +379,7 @@ export default function Medicine({ table, session }: any) {
             <h2 className="text-xl font-semibold text-center">
               Struk Transaksi
             </h2>
-            <h2 className="text-md font-semibold text-right">
+            <h2 className="text-md font-semibold text-right uppercase">
               Kasir: {session?.name}
             </h2>
             <p className="text-right">{moment().format("DD-MM-YYYY HH:mm")}</p>
@@ -410,7 +410,7 @@ export default function Medicine({ table, session }: any) {
                     </div>
                     <div className="w-[150px]">
                       <p className="text-xs">
-                        Rp {toMoney(+item?.price * +item?.total)}
+                        Rp {toMoney(+item?.selling_price * +item?.total)}
                       </p>
                     </div>
                   </div>
@@ -425,7 +425,7 @@ export default function Medicine({ table, session }: any) {
                 <p>
                   Rp{" "}
                   {toMoney(
-                    items?.reduce((a: any, b: any) => a + b.price * b.total, 0)
+                    items?.reduce((a: any, b: any) => a + b.selling_price * b.total, 0)
                   )}
                 </p>
               </div>
