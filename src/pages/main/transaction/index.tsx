@@ -124,7 +124,7 @@ export default function Medicine({ table, session, stores }: any) {
       sortable: true,
       selector: (row: any) => toMoney(row?.selling_price) || "0",
     },
-    session?.role !== "admin_store" && {
+    session?.role !== "admin_warehouse" && {
       name: "Aksi",
       right: true,
       selector: (row: any) => (
@@ -192,7 +192,7 @@ export default function Medicine({ table, session, stores }: any) {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const printReceipt = async () => {
+  const printReceipt = async (trx_code: string) => {
     // Generate PDF after form submission
     const canvas = await html2canvas(receiptRef.current, {
       scale: 2,
@@ -209,7 +209,7 @@ export default function Medicine({ table, session, stores }: any) {
 
     pdf.addImage(imgData, "PNG", 0, 0, 58, (canvas.height * 58) / canvas.width);
     pdf.autoPrint(); // Optional: trigger print dialog
-    pdf.save("receipt.pdf"); // Or send to printer
+    pdf.save(`${trx_code}.pdf`); // Or send to printer
   };
 
   const onSubmit = async () => {
@@ -240,7 +240,7 @@ export default function Medicine({ table, session, stores }: any) {
           },
         }
       );
-      printReceipt();
+      printReceipt(result?.data?.items?.code);
 
       Swal.fire({
         icon: "success",
@@ -248,6 +248,7 @@ export default function Medicine({ table, session, stores }: any) {
       });
       setLoading(false);
       setModal({ ...modal, open: false });
+      setItems([]);
       router.push("");
     } catch (error) {
       setLoading(false);
@@ -440,7 +441,9 @@ export default function Medicine({ table, session, stores }: any) {
                         className="flex gap-2 justify-between items-center mt-4"
                       >
                         <div className="w-full">
-                          <p className="text-[7px] font-semibold">{item?.name}</p>
+                          <p className="text-[10px] font-semibold">
+                            {item?.name}
+                          </p>
                         </div>
                         <div className="w-[150px]">
                           <p className="text-xs ml-4">{item?.total}</p>

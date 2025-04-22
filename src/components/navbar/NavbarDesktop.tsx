@@ -91,11 +91,11 @@ export default function NavbarDesktop({
       href: `/main/refund`,
       icon: <SendToBackIcon />,
     },
-    {
-      name: "Request Toko",
-      href: `/main/po`,
-      icon: <ClipboardListIcon />,
-    },
+    // {
+    //   name: "Request Toko",
+    //   href: `/main/po`,
+    //   icon: <ClipboardListIcon />,
+    // },
     session?.role !== "admin_store" && {
       name: "Pengiriman",
       href: `/main/do`,
@@ -106,7 +106,8 @@ export default function NavbarDesktop({
       href: `/main/expired`,
       icon: <TriangleAlertIcon />,
     },
-    (session?.email?.includes("@rbpgroup.com") || session?.email?.includes("@stokinventory.com")) && {
+    (session?.email?.includes("@rbpgroup.com") ||
+      session?.email?.includes("@stokinventory.com")) && {
       name: "Daftar Resep",
       href: `/main/recipe`,
       icon: <ClipboardCheckIcon />,
@@ -116,19 +117,19 @@ export default function NavbarDesktop({
       href: `/main/transaction`,
       icon: <Boxes />,
     },
-    session?.role !== "admin_store" && {
+    {
       name: "Laporan",
       icon: <ClipboardListIcon />,
       children: [
-        {
+        session?.role !== "admin_store" && {
           name: "Laporan Harian",
           href: `/main/report/daily`,
         },
         {
           name: "Laporan Transaksi",
           href: `/main/report/transaction`,
-        }
-      ],
+        },
+      ]?.filter((v: any) => v !== false),
     },
     session?.role == "super_admin" && {
       name: "Akses Admin",
@@ -170,7 +171,11 @@ export default function NavbarDesktop({
               onChange={(e: any) => {
                 setCookie(
                   "session",
-                  JSON.stringify({ ...session, partner_code: e?.value, partner: e })
+                  JSON.stringify({
+                    ...session,
+                    partner_code: e?.value,
+                    partner: e,
+                  })
                 );
                 router.push("");
               }}
@@ -240,7 +245,7 @@ export default function NavbarDesktop({
             <hr className="border-white" />
           </div>
           <div className="flex flex-col mt-5">
-            {navs?.map((v: any, i:number) => {
+            {navs?.map((v: any, i: number) => {
               if (v?.children) {
                 return (
                   <div className="w-full" key={i}>
@@ -255,9 +260,7 @@ export default function NavbarDesktop({
                       onClick={() => {
                         if (subgroup?.includes(v?.name)) {
                           setSubgroup(
-                            subgroup?.filter(
-                              (val: any) => val !== v?.name
-                            )
+                            subgroup?.filter((val: any) => val !== v?.name)
                           );
                         } else {
                           setSubgroup([...subgroup, v?.name]);
@@ -269,7 +272,13 @@ export default function NavbarDesktop({
                         {v?.name}
                       </div>
                       <div>
-                        <ChevronRightIcon className={`text-gray-500 transition-transform transform duration-500 ${subgroup?.includes(v?.name) ? "rotate-90" : "rotate-0"}`} />
+                        <ChevronRightIcon
+                          className={`text-gray-500 transition-transform transform duration-500 ${
+                            subgroup?.includes(v?.name)
+                              ? "rotate-90"
+                              : "rotate-0"
+                          }`}
+                        />
                       </div>
                     </button>
                     {subgroup?.includes(v?.name) &&
