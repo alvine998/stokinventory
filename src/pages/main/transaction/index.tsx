@@ -6,6 +6,8 @@ import { CONFIG } from "@/config";
 import { toMoney } from "@/utils";
 import axios from "axios";
 import { getCookie } from "cookies-next";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   ClipboardList,
   MinusIcon,
@@ -19,9 +21,10 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
+import ReactSelect from "react-select";
 
 export async function getServerSideProps(context: any) {
   try {
@@ -43,9 +46,22 @@ export async function getServerSideProps(context: any) {
         },
       }
     );
+    const stores = await axios.get(
+      CONFIG.base_url_api +
+        `/stores?pagination=true&page=${+page - 1 || 0}&size=${
+          +size || 10
+        }&search=${search || ""}&id=${session?.store_id || ""}`,
+      {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+          "x-partner-code": session?.partner_code,
+        },
+      }
+    );
     return {
       props: {
         table: result?.data || [],
+        stores: stores?.data?.items || [],
         session,
       },
     };
@@ -59,12 +75,22 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function Medicine({ table, session }: any) {
+export default function Medicine({ table, session, stores }: any) {
   const router = useRouter();
   const [filter, setFilter] = useState<any>(router.query);
   const [show, setShow] = useState<boolean>(false);
   const [modal, setModal] = useState<useModal>();
   const [items, setItems] = useState<any>([]);
+  const [selectStore, setSelectStore] = useState<any>();
+  const STORES = [
+    { value: "", label: "Pilih Toko" },
+    ...stores?.map((v: any) => ({
+      ...v,
+      value: v?.id,
+      label: v?.name,
+    })),
+  ];
+  const receiptRef = useRef<any>(null);
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShow(true);
@@ -166,57 +192,47 @@ export default function Medicine({ table, session }: any) {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onSubmit = async (e: any) => {
-    e?.preventDefault();
+  const printReceipt = async () => {
+    // Generate PDF after form submission
+    const canvas = await html2canvas(receiptRef.current, {
+      scale: 2,
+      useCORS: true,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [58, (canvas.height * 58) / canvas.width], // Set width to 58mm
+    });
+
+    pdf.addImage(imgData, "PNG", 0, 0, 58, (canvas.height * 58) / canvas.width);
+    pdf.autoPrint(); // Optional: trigger print dialog
+    pdf.save("receipt.pdf"); // Or send to printer
+  };
+
+  const onSubmit = async () => {
     setLoading(true);
-    const formData: any = Object.fromEntries(new FormData(e.target));
     try {
       const payload = {
-        ...formData,
-        price: formData?.price?.replaceAll(".", ""),
+        store_id: session?.store_id || selectStore?.id,
+        store_name: session?.store_name || selectStore?.name,
+        cashier_id: session?.id,
+        cashier_name: session?.name,
+        discount: 0,
+        tax: 0,
+        products: items?.map((v: any) => ({
+          id: v?.id,
+          name: v?.name,
+          qty: v?.total,
+          selling_price: v?.selling_price,
+          price: v?.price,
+        })),
       };
-      if (formData?.id) {
-        const result = await axios.patch(
-          CONFIG.base_url_api + `/product`,
-          payload,
-          {
-            headers: {
-              "bearer-token": "stokinventoryapi",
-              "x-partner-code": session?.partner_code,
-            },
-          }
-        );
-      } else {
-        const result = await axios.post(
-          CONFIG.base_url_api + `/product`,
-          payload,
-          {
-            headers: {
-              "bearer-token": "stokinventoryapi",
-              "x-partner-code": session?.partner_code,
-            },
-          }
-        );
-      }
-      Swal.fire({
-        icon: "success",
-        text: "Data Berhasil Disimpan",
-      });
-      setLoading(false);
-      setModal({ ...modal, open: false });
-      router.push("");
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-    }
-  };
-  const onRemove = async (e: any) => {
-    try {
-      e?.preventDefault();
-      setLoading(true);
-      const formData = Object.fromEntries(new FormData(e.target));
-      const result = await axios.delete(
-        CONFIG.base_url_api + `/product?id=${formData?.id}`,
+      const result = await axios.post(
+        CONFIG.base_url_api + `/transaction`,
+        payload,
         {
           headers: {
             "bearer-token": "stokinventoryapi",
@@ -224,9 +240,11 @@ export default function Medicine({ table, session }: any) {
           },
         }
       );
+      printReceipt();
+
       Swal.fire({
         icon: "success",
-        text: "Data Berhasil Dihapus",
+        text: "Data Berhasil Disimpan",
       });
       setLoading(false);
       setModal({ ...modal, open: false });
@@ -376,61 +394,118 @@ export default function Medicine({ table, session }: any) {
             open={modal.open}
             setOpen={() => setModal({ ...modal, open: false })}
           >
-            <h2 className="text-xl font-semibold text-center">
-              Struk Transaksi
-            </h2>
-            <h2 className="text-md font-semibold text-right uppercase">
-              Kasir: {session?.name}
-            </h2>
-            <p className="text-right">{moment().format("DD-MM-YYYY HH:mm")}</p>
-            <div>
-              <div className="flex gap-2 justify-between items-center mt-4">
-                <div className="w-full">
-                  <p className="text-md font-semibold">Item</p>
-                </div>
-                <div className="w-[150px]">
-                  <p className="text-md">Jumlah</p>
-                </div>
-                <div className="w-[150px]">
-                  <p className="text-md">Harga</p>
-                </div>
-              </div>
-              {items
-                ?.filter((v: any) => v?.total > 0)
-                ?.map((item: any, index: number) => (
-                  <div
-                    key={index}
-                    className="flex gap-2 justify-between items-center mt-4"
-                  >
+            <div className="flex justify-center items-center">
+              <div
+                ref={receiptRef}
+                style={{
+                  width: "58mm",
+                  padding: "5mm",
+                  fontSize: "10px",
+                  lineHeight: "1.4",
+                  fontFamily: "monospace",
+                  background: "#fff",
+                  color: "#000",
+                  paddingBottom: "20px",
+                }}
+              >
+                <h2 className="text-xl font-semibold text-center">
+                  {session?.partner?.name}
+                </h2>
+                <h2 className="text-[7px] text-center mt-2">
+                  {selectStore?.address || stores?.[0]?.address || ""}
+                </h2>
+                <h2 className="text-md font-semibold text-right uppercase mt-2">
+                  Kasir: {session?.name}
+                </h2>
+                <p className="text-right">
+                  {moment().format("DD-MM-YYYY HH:mm")}
+                </p>
+                <div>
+                  <div className="flex gap-2 justify-between items-center mt-4">
                     <div className="w-full">
-                      <p className="text-xs font-semibold">{item?.name}</p>
+                      <p className="text-xs font-semibold">Item</p>
                     </div>
                     <div className="w-[150px]">
-                      <p className="text-xs ml-4">{item?.total}</p>
+                      <p className="text-xs">Jumlah</p>
                     </div>
                     <div className="w-[150px]">
-                      <p className="text-xs">
-                        Rp {toMoney(+item?.selling_price * +item?.total)}
-                      </p>
+                      <p className="text-xs">Harga</p>
                     </div>
                   </div>
-                ))}
-              <div className="border-b-2 border-gray-700 w-full mt-2"></div>
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-xs">Total Item</p>
-                <p>{items?.filter((v: any) => v?.total > 0)?.length}</p>
-              </div>
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-xs">Total Harga</p>
-                <p>
-                  Rp{" "}
-                  {toMoney(
-                    items?.reduce((a: any, b: any) => a + b.selling_price * b.total, 0)
-                  )}
-                </p>
+                  {items
+                    ?.filter((v: any) => v?.total > 0)
+                    ?.map((item: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex gap-2 justify-between items-center mt-4"
+                      >
+                        <div className="w-full">
+                          <p className="text-[7px] font-semibold">{item?.name}</p>
+                        </div>
+                        <div className="w-[150px]">
+                          <p className="text-xs ml-4">{item?.total}</p>
+                        </div>
+                        <div className="w-[150px]">
+                          <p className="text-xs">
+                            {toMoney(+item?.selling_price * +item?.total)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  <div className="border-b-2 border-gray-700 w-full mt-2"></div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs">Total Item</p>
+                    <p className="text-xs">
+                      {items?.filter((v: any) => v?.total > 0)?.length}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs">Total Harga</p>
+                    <p className="text-xs">
+                      Rp{" "}
+                      {toMoney(
+                        items?.reduce(
+                          (a: any, b: any) => a + b.selling_price * b.total,
+                          0
+                        )
+                      )}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-            <Button className={"mt-5"}>Simpan & Cetak</Button>
+
+            {session?.role == "super_admin" ? (
+              <div className="mt-2">
+                <label htmlFor="store" className="text-gray-500">
+                  Toko
+                </label>
+                <ReactSelect
+                  id="store"
+                  menuPlacement="top"
+                  name="store"
+                  required
+                  options={STORES}
+                  onChange={(e: any) => {
+                    setSelectStore(e);
+                  }}
+                  defaultValue={{
+                    value:
+                      STORES?.find((v: any) => v.value == modal?.data?.store_id)
+                        ?.id || "",
+                    label:
+                      STORES?.find((v: any) => v.value == modal?.data?.store_id)
+                        ?.name || "Pilih Toko",
+                  }}
+                />
+              </div>
+            ) : (
+              ""
+            )}
+
+            <Button className={"mt-5"} type="button" onClick={onSubmit}>
+              {loading ? "Memproses..." : "Simpan & Cetak"}
+            </Button>
             <Button
               type="button"
               onClick={() => {

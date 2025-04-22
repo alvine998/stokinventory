@@ -75,11 +75,11 @@ export default function NavbarMobile({
       href: `/main/so/in`,
       icon: <ArrowLeftRightIcon />,
     },
-    {
-      name: "Order",
-      href: `/main/po`,
-      icon: <ClipboardListIcon />,
-    },
+    // {
+    //   name: "Order",
+    //   href: `/main/po`,
+    //   icon: <ClipboardListIcon />,
+    // },
     {
       name: "Delivery",
       href: `/main/do`,
@@ -100,6 +100,11 @@ export default function NavbarMobile({
       name: "Transaksi",
       href: `/main/transaction`,
       icon: <Boxes />,
+    },
+    {
+      name: "Laporan Transaksi",
+      href: `/main/report/transaction`,
+      icon: <ClipboardListIcon />,
     },
     session?.role == "super_admin" && {
       name: "Akses Admin",

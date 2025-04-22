@@ -123,6 +123,10 @@ export default function NavbarDesktop({
         {
           name: "Laporan Harian",
           href: `/main/report/daily`,
+        },
+        {
+          name: "Laporan Transaksi",
+          href: `/main/report/transaction`,
         }
       ],
     },
