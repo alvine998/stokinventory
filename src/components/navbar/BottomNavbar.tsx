@@ -9,10 +9,13 @@ import React from "react";
 
 export default function BottomNavbar() {
   return (
-    <div className="bg-blue-300 h-[350px] max-w-full px-10 py-10 relative">
-      <div className="flex gap-[40px]">
-        <div className="w-[600px]">
-          <Link className="text-3xl text-blue-700 font-bold font-sans" href="/">
+    <div className="bg-blue-300 md:h-[350px] h-auto max-w-full md:px-10 md:py-10 px-2 py-2 relative">
+      <div className="flex gap-[40px] md:flex-row flex-col">
+        <div className="md:w-[600px] w-full">
+          <Link
+            className="text-3xl text-blue-700 font-bold font-sans md:text-left text-center"
+            href="/"
+          >
             STOKINVENTORY.COM
           </Link>
           <div className="mt-2">
@@ -26,8 +29,8 @@ export default function BottomNavbar() {
           </div>
         </div>
 
-        <div className="flex justify-start gap-4 w-full">
-          <div className="w-[180px]">
+        <div className="flex justify-start gap-4 w-full md:flex-row flex-col md:mb-0 mb-10">
+          <div className="md:w-[180px] w-full md:px-0 px-4">
             <h5 className="text-lg text-blue-700 font-bold font-sans">
               Layanan
             </h5>
@@ -50,7 +53,7 @@ export default function BottomNavbar() {
             </div>
           </div>
 
-          <div className="w-[180px]">
+          <div className="md:w-[180px] w-full md:px-0 px-4">
             <h5 className="text-lg text-blue-700 font-bold font-sans">
               Navigasi
             </h5>
@@ -73,7 +76,7 @@ export default function BottomNavbar() {
             </div>
           </div>
 
-          <div className="w-[180px]">
+          <div className="md:w-[180px] w-full md:px-0 px-4">
             <h5 className="text-lg text-blue-700 font-bold font-sans">
               Kontak
             </h5>
@@ -105,16 +108,15 @@ export default function BottomNavbar() {
             </div>
           </div>
 
-          <div className="w-[180px]">
+          <div className="md:w-[180px] w-full md:px-0 px-4">
             <h5 className="text-lg text-blue-700 font-bold font-sans">
               Lokasi
             </h5>
             <div className="mt-4">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d990.0523278315974!2d107.63145639837235!3d-6.984606640667532!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sid!2sid!4v1728374758801!5m2!1sid!2sid"
-                width="350"
-                height="200"
                 allowFullScreen
+                className="md:w-[370px] w-full md:h-[200px] h-[200px] rounded-lg"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
@@ -123,8 +125,8 @@ export default function BottomNavbar() {
         </div>
       </div>
 
-      <p className="text-center absolute bottom-2 right-0 left-0">
-        &copy; alvinecom 2024
+      <p className="text-center font-bold absolute md:bottom-2 bottom-2 right-0 left-0">
+        &copy;FQLABS.ID 2024
       </p>
     </div>
   );

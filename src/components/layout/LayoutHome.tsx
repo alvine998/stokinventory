@@ -7,6 +7,7 @@ import { getCookie } from "cookies-next";
 import axios from "axios";
 import { CONFIG } from "@/config";
 import NavbarHomeDesktop from "../navbar/NavbarHomeDesktop";
+import NavbarHomeMobile from "../navbar/NavbarHomeMobile";
 
 export default function LayoutHome({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -14,20 +15,16 @@ export default function LayoutHome({ children }: { children: ReactNode }) {
   const [partners, setPartners] = useState<any>([]);
   const getPartners = async () => {
     try {
-      const result = await axios.get(
-        CONFIG.base_url_api +
-          `/partners`,
-        {
-          headers: {
-            "bearer-token": "stokinventoryapi"
-          },
-        }
-      );
-      setPartners(result.data.items)
+      const result = await axios.get(CONFIG.base_url_api + `/partners`, {
+        headers: {
+          "bearer-token": "stokinventoryapi",
+        },
+      });
+      setPartners(result.data.items);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   useEffect(() => {
     getPartners();
     let sessions: any = getCookie("session");
@@ -43,9 +40,9 @@ export default function LayoutHome({ children }: { children: ReactNode }) {
       <div className="lg:block hidden">
         <NavbarHomeDesktop>{children}</NavbarHomeDesktop>
       </div>
-      {/* <div className="lg:hidden block">
-        <NavbarMobile session={session}>{children}</NavbarMobile>
-      </div> */}
+      <div className="lg:hidden block">
+        <NavbarHomeMobile session={session}>{children}</NavbarHomeMobile>
+      </div>
     </section>
   );
 }
